@@ -42,13 +42,13 @@ class MainActivity : AppCompatActivity() {
             var jsonBody = JSONObject()
             jsonBody.put("b64",imageUriToBase64())
             Log.e("JSON",jsonBody.toString())
-            val stringRequest = JsonObjectRequest(Request.Method.POST,url,jsonBody, Response.Listener<JSONObject> {
+            val stringRequest = JsonObjectRequest(Request.Method.POST,url,jsonBody, {
                 responseText.text = it.toString(2)
             },
-            Response.ErrorListener {
-                responseText.text = it.toString()
-                println(it)
-                })
+                {
+                    responseText.text = it.toString()
+                    println(it)
+                    })
 
                 queue.add(stringRequest)
             }

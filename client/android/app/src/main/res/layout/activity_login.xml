@@ -5,59 +5,19 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".LoginActivity">
+        android:layout_height="match_parent">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/nav_host_fragment"
+            android:name="androidx.navigation.fragment.NavHostFragment"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:defaultNavHost="true"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/emailField"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/email">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="textEmailAddress" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/passwordField"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/password"
-                app:endIconMode="password_toggle">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="textPassword" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnSignInWithEmail"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/sign_in_with_email" />
-
-            <com.shobhitpuri.custombuttons.GoogleSignInButton
-                android:id="@+id/btnGoogleSignIn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/google_sign_in"
-                app:isDarkTheme="false" />
-
-        </LinearLayout>
-
+            app:layout_constraintTop_toTopOf="parent"
+            app:navGraph="@navigation/login_nav" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
