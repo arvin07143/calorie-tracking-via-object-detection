@@ -1,0 +1,46 @@
+item {
+    id: 1
+    name: 'fish_and_chips'
+}
+item {
+    id: 2
+    name: 'char_kuey_tiaw'
+}
+item {
+    id: 3
+    name: 'fried_rice'
+}
+item {
+    id: 4
+    name: 'hamburger'
+}
+item {
+    id: 5
+    name: 'kaya_toast'
+}
+item {
+    id: 6
+    name: 'laksa'
+}
+item {
+    id: 7
+    name: 'nasi_lemak'
+}
+item {
+    id: 8
+    name: 'popiah'
+}
+item {
+    id: 9
+    name: 'satay'
+}
+
+item {
+    id: 10
+    name: 'spring_roll'
+}
+
+item {
+    id: 11
+    name: 'roti_canai'
+}	

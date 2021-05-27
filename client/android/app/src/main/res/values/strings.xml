@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">fyp</string>
+    <string name="email">Email Address</string>
+    <string name="password">Password</string>
+    <string name="sign_in_with_email">Sign In With Email</string>
+    <string name="sign_in_with_google">Sign In With Google</string>
+
 </resources>

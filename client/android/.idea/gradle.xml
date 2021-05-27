@@ -9,8 +9,8 @@
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="modules">
           <set>
-            <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/app" />
+            <option value="/mnt/9CB8BDB8B8BD90EE/Work Files/Final Year Project/fyp-repo/client/android" />
+            <option value="/mnt/9CB8BDB8B8BD90EE/Work Files/Final Year Project/fyp-repo/client/android/app" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />
