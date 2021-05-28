@@ -1,4 +1,5 @@
 from . import config
+from app import routes, models
 from flask import Flask
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
@@ -14,4 +15,3 @@ if len(firebase_admin._apps) == 0:
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
-from app import routes, models
