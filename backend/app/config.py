@@ -11,6 +11,7 @@ class Config(object):
     NUTRITIONIX_APP_ID = '0b6fab2a'
     NUTRITIONIX_API_KEY = '5468ce4133bea2bc4c73132bac529470'
     NUTRITIONIX_API_URL = 'https://api.nutritionix.com/v1_1/search'
+    FIREBASE_ADMIN_CRED_PATH = 'final-year-project-857e3-firebase-adminsdk-bg3u9-544b4b8d99.json'
 
     @property
     def SQLALCHEMY_DATABASE_URI(self):

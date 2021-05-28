@@ -2,20 +2,27 @@ import base64
 import json
 import os
 from io import BytesIO
-import config
+
+import firebase_admin
 import numpy as np
 import requests
 from PIL import Image
+from firebase_admin import auth
+from firebase_admin import credentials
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from object_detection.utils.label_map_util import create_category_index_from_labelmap
 from werkzeug.exceptions import BadRequest
 
-from ai.TensorFlow.models.research.object_detection.utils import label_map_util
+from . import config
 
 app = Flask(__name__)
 app.config.from_object(config.DevelopmentConfig())
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+cred = credentials.Certificate(app.config['FIREBASE_ADMIN_CRED_PATH'])
+if len(firebase_admin._apps) == 0:
+    firebase_admin.initialize_app(cred)
 
 
 @app.route("/")
@@ -23,10 +30,12 @@ def hello_world():
     return "Hello World"
 
 
-@app.route("/detection/predict/", methods=['GET'])
+@app.route("/detection/predict/", methods=['GET', 'POST'])
 def inference():
-    PATH_TO_LABELS = "/media/arvin07143/Data/Work Files/Final Year Project/fyp-repo/backend/api/label_map.pbtxt"
+    PATH_TO_LABELS = "label_map.pbtxt"
     image_b64 = ""
+    if not auth_api_key(request.headers['Authorization']):
+        raise handle_invalid_usage('Invalid JWT', error=401)
     try:
         data = request.json
         image_b64 = data['b64']
@@ -45,8 +54,8 @@ def inference():
     detected_items_index = [i for i in range(len(pred['detection_scores'])) if pred['detection_scores'][i] > 0.5]
 
     output_data = dict()
-    category_index = label_map_util.create_category_index_from_labelmap(PATH_TO_LABELS,
-                                                                        use_display_name=True)
+    category_index = create_category_index_from_labelmap(PATH_TO_LABELS,
+                                                         use_display_name=True)
 
     for i in detected_items_index:
         out = dict()
@@ -55,7 +64,7 @@ def inference():
         out['detection_score'] = out.get('detection_score', 0) + pred['detection_scores'][i]
         output_data["predictions"] = output_data.get("predictions", []) + [out]
 
-    return jsonify(output_data)
+    return output_data
 
 
 @app.route("/nutrition/calories", methods=['GET'])
@@ -66,6 +75,7 @@ def get_caloric_content():
     except (TypeError, BadRequest, KeyError) as ex:
         food_name = request.args['food-name']
 
+    print(request.headers)
     url = app.config['NUTRITIONIX_API_URL']
     api_params = {
         "appId": app.config['NUTRITIONIX_APP_ID'],
@@ -83,6 +93,27 @@ def get_caloric_content():
         return "Not found"
 
     return calorie_data['hits'][0]['fields']  # we are only using the 1st element
+
+
+def auth_api_key(id_token):
+    decoded_token = auth.verify_id_token(id_token)
+    uid = decoded_token['uid']
+    if uid is not None:
+        print(uid)
+        return True
+    else:
+        return False
+
+
+# @app.errorhandler(InvalidUsage)
+# def handle_invalid_usage(error):
+#     response = jsonify(error.to_dict())
+#     response.status_code = error.status_code
+#     return response
+
+@app.errorhandler(auth.InvalidIdTokenError)
+def handle_bad_request(e):
+    return 'Invalid Token!', 401
 
 
 if __name__ == "__main__":
