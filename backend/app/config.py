@@ -5,8 +5,8 @@ class Config(object):
     DEBUG = False
     TESTING = False
     DB_SERVER = ''
-    USER_NAME = ''
-    USER_PASSWORD = ''
+    USER_NAME = 'arvin07143'
+    USER_PASSWORD = 'arvinng07143'
     DB_NAME = 'mydb'
     NUTRITIONIX_APP_ID = '0b6fab2a'
     NUTRITIONIX_API_KEY = '5468ce4133bea2bc4c73132bac529470'

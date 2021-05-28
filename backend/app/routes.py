@@ -10,7 +10,7 @@ from firebase_admin import auth
 from flask import Flask, request, jsonify
 from object_detection.utils.label_map_util import create_category_index_from_labelmap
 
-from app import app
+from . import app
 
 
 @app.route("/")
