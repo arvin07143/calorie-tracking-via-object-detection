@@ -3,26 +3,14 @@ import json
 import os
 from io import BytesIO
 
-import firebase_admin
 import numpy as np
 import requests
 from PIL import Image
 from firebase_admin import auth
-from firebase_admin import credentials
 from flask import Flask, request, jsonify
-from flask_sqlalchemy import SQLAlchemy
 from object_detection.utils.label_map_util import create_category_index_from_labelmap
-from werkzeug.exceptions import BadRequest
 
-from . import config
-
-app = Flask(__name__)
-app.config.from_object(config.DevelopmentConfig())
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
-cred = credentials.Certificate(app.config['FIREBASE_ADMIN_CRED_PATH'])
-if len(firebase_admin._apps) == 0:
-    firebase_admin.initialize_app(cred)
+from app import app
 
 
 @app.route("/")
