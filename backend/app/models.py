@@ -11,8 +11,6 @@ class GenderEnum(enum.Enum):
 class User(db.Model):
     __tablename__ = 'users'
     uid = db.Column(db.String, primary_key=True)
-    profile_name = db.Column(db.String)
-    email = db.Column(db.String)
     gender = db.Column(db.Enum(GenderEnum))
     height = db.Column(db.Integer)
     weight = db.Column(db.Float)

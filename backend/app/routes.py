@@ -9,8 +9,9 @@ from PIL import Image
 from firebase_admin import auth
 from flask import Flask, request, jsonify
 from object_detection.utils.label_map_util import create_category_index_from_labelmap
+from werkzeug.exceptions import BadRequest
 
-from . import app
+from . import app, models, db
 
 
 @app.route("/")
@@ -22,37 +23,59 @@ def hello_world():
 def inference():
     PATH_TO_LABELS = "label_map.pbtxt"
     image_b64 = ""
-    if not auth_api_key(request.headers['Authorization']):
-        raise handle_invalid_usage('Invalid JWT', error=401)
-    try:
+    if auth_api_key(request.headers['Authorization']) is not None:
+        try:
+            data = request.json
+            image_b64 = data['b64']
+        except (TypeError, BadRequest, KeyError):
+            image_b64 = request.args["b64"]
+
+        received_image = Image.open(BytesIO(base64.b64decode(image_b64)))
+        np_img = np.array(received_image.convert('RGB'))
+
+        payload = {
+            "instances": [np_img.tolist()]
+        }
+
+        r = requests.post("http://localhost:8501/v1/models/my_model:predict", json=payload)
+        pred = (r.json())["predictions"][0]
+        detected_items_index = [i for i in range(len(pred['detection_scores'])) if pred['detection_scores'][i] > 0.5]
+
+        output_data = dict()
+        category_index = create_category_index_from_labelmap(PATH_TO_LABELS,
+                                                             use_display_name=True)
+
+        for i in detected_items_index:
+            out = dict()
+            out['detection_box'] = out.get('detection_box', []) + pred['detection_boxes'][i]
+            out['detection_class'] = out.get('detection_class', "") + category_index[pred['detection_classes'][i]][
+                'name']
+            out['detection_score'] = out.get('detection_score', 0) + pred['detection_scores'][i]
+            output_data["predictions"] = output_data.get("predictions", []) + [out]
+
+        return output_data
+
+
+@app.route("/user/register", methods=['POST'])
+def register_new_user():
+    uid = auth_api_key(request.headers['Authorization'])
+    if uid is not None:
         data = request.json
-        image_b64 = data['b64']
-    except (TypeError, BadRequest, KeyError):
-        image_b64 = request.args["b64"]
+        gender = data['gender']
+        height = data['height']
+        weight = data['weight']
+        new_user = models.User(uid, gender, height, weight)
+        db.session.add(new_user)
+        db.session.commit()
+        return jsonify(message="User added successfully")
 
-    received_image = Image.open(BytesIO(base64.b64decode(image_b64)))
-    np_img = np.array(received_image.convert('RGB'))
 
-    payload = {
-        "instances": [np_img.tolist()]
-    }
-
-    r = requests.post("http://localhost:8501/v1/models/my_model:predict", json=payload)
-    pred = (r.json())["predictions"][0]
-    detected_items_index = [i for i in range(len(pred['detection_scores'])) if pred['detection_scores'][i] > 0.5]
-
-    output_data = dict()
-    category_index = create_category_index_from_labelmap(PATH_TO_LABELS,
-                                                         use_display_name=True)
-
-    for i in detected_items_index:
-        out = dict()
-        out['detection_box'] = out.get('detection_box', []) + pred['detection_boxes'][i]
-        out['detection_class'] = out.get('detection_class', "") + category_index[pred['detection_classes'][i]]['name']
-        out['detection_score'] = out.get('detection_score', 0) + pred['detection_scores'][i]
-        output_data["predictions"] = output_data.get("predictions", []) + [out]
-
-    return output_data
+@app.route("/user/retrieve", methods=['GET'])
+def get_user_data():
+    uid = auth_api_key(request.headers['Authorization'])
+    if uid is not None:
+        user = models.User.query.get(uid)
+        return jsonify(uid=uid, gender=user.gender, height=user.height, weight=user.weight)
 
 
 @app.route("/nutrition/calories", methods=['GET'])
@@ -87,10 +110,9 @@ def auth_api_key(id_token):
     decoded_token = auth.verify_id_token(id_token)
     uid = decoded_token['uid']
     if uid is not None:
-        print(uid)
-        return True
+        return uid
     else:
-        return False
+        return None
 
 
 # @app.errorhandler(InvalidUsage)

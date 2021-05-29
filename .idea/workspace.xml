@@ -8,18 +8,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="efc012ca-66c2-4e1f-b119-b68637a6307f" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/backend/app/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/models.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ai/TensorFlow/models/research/object_detection/utils/visualization_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/ai/TensorFlow/models/research/object_detection/utils/visualization_utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/api/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/flaskapp.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/api/api_app.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/api/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/config.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/api/label_map.pbtxt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/label_map.pbtxt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/api/manage.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/manage.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/api/models.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/api/object_detection_api.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/object_detection_api.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/android/app/src/main/java/com/example/fyp/MainActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/client/android/app/src/main/java/com/example/fyp/MainActivity.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -53,14 +44,16 @@
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
+    <option name="showMembers" value="true" />
   </component>
   <component name="PropertiesComponent">
     <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
+    <property name="ASKED_MARK_IGNORED_FILES_AS_EXCLUDED" value="true" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/backend/flaskapp.py" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/backend" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
@@ -86,11 +79,12 @@
       <recent name="$PROJECT_DIR$/backend/api" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/backend/app" />
       <recent name="$PROJECT_DIR$/backend/api" />
       <recent name="$PROJECT_DIR$/backend/test" />
     </key>
   </component>
-  <component name="RunManager" selected="Flask server.Flask (../flaskapp.py)">
+  <component name="RunManager" selected="Flask server.Flask (flaskapp.py)">
     <configuration default="true" type="PythonConfigurationType" factoryName="Python">
       <module name="fyp-repo" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -201,9 +195,9 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="Flask (../flaskapp.py)" type="Python.FlaskServer" nameIsGenerated="true">
+    <configuration name="Flask (flaskapp.py)" type="Python.FlaskServer" nameIsGenerated="true">
       <option name="flaskDebug" value="true" />
-      <option name="target" value="$PROJECT_DIR$/backend/flaskapp.py" />
+      <option name="target" value="$PROJECT_DIR$/backend/app/flaskapp.py" />
       <option name="targetType" value="PATH" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -218,7 +212,7 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Flask server.Flask (../flaskapp.py)" />
+      <item itemvalue="Flask server.Flask (flaskapp.py)" />
       <item itemvalue="Python.detectionOnVideo" />
       <item itemvalue="Python.plot_object_detection_saved_model" />
       <item itemvalue="Python.testdb" />
@@ -253,7 +247,8 @@
       <workItem from="1622181911783" duration="1651000" />
       <workItem from="1622184329631" duration="498000" />
       <workItem from="1622184836831" duration="201000" />
-      <workItem from="1622185169267" duration="11733000" />
+      <workItem from="1622185169267" duration="12366000" />
+      <workItem from="1622199211554" duration="34000" />
     </task>
     <servers />
   </component>
