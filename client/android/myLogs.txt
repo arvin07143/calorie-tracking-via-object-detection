@@ -1,0 +1,8 @@
+
+Command 'gradle' not found, but can be installed with:
+
+sudo snap install gradle  # version 7.0.2, or
+sudo apt  install gradle  # version 4.4.1-10
+
+See 'snap info gradle' for additional versions.
+

@@ -8,4 +8,13 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="confirm_password">Confirm Password</string>
     <string name="profile_name">Profile Name</string>
+    <string name="male">Male</string>
+    <string name="female">Female</string>
+    <string name="other">Other</string>
+    <string name="gender">Gender</string>
+    <string name="date_of_birth">Date of Birth</string>
+    <string name="height">Height</string>
+    <string name="weight">Weight</string>
+    <string name="height_value">%d cm</string>
+    <string name="weight_value">%d kg</string>
 </resources>

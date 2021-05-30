@@ -49,11 +49,11 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        Log.e("a","ACTIVITY START")
-        val currentUser = auth.currentUser
-        if (currentUser != null) {
-            Navigation.findNavController(this,R.id.nav_host_fragment).navigate(R.id.action_loginFragment_to_mainActivity)
-        }
+//        Log.e("a","ACTIVITY START")
+//        val currentUser = auth.currentUser
+//        if (currentUser != null) {
+//            Navigation.findNavController(this,R.id.nav_host_fragment).navigate(R.id.action_loginFragment_to_mainActivity)
+//        }
     }
 
     private fun createEmailAccount(email: String, password: String) {

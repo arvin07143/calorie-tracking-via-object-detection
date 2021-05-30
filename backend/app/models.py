@@ -17,6 +17,12 @@ class User(db.Model):
     goals = db.relationship("Goal")
     meals = db.relationship("Meal")
 
+    def __init__(self,uid,gender,height,weight):
+        self.uid = uid
+        self.gender = gender
+        self.height = height
+        self.weight = weight
+
 
 class GoalEnum(enum.Enum):
     WEIGHT_GOAL = 0

@@ -56,7 +56,7 @@ def inference():
         return output_data
 
 
-@app.route("/user/register", methods=['POST'])
+@app.route("/user/register/", methods=['POST'])
 def register_new_user():
     uid = auth_api_key(request.headers['Authorization'])
     if uid is not None:
