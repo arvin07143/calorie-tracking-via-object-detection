@@ -2,7 +2,7 @@ from . import db
 import enum
 
 
-class GenderEnum(enum.Enum):
+class GenderEnum(enum.IntEnum):
     MALE = 0
     FEMALE = 1
     UNDEFINED = 2
@@ -14,17 +14,19 @@ class User(db.Model):
     gender = db.Column(db.Enum(GenderEnum))
     height = db.Column(db.Integer)
     weight = db.Column(db.Float)
+    date_of_birth = db.Column(db.Date)
     goals = db.relationship("Goal")
     meals = db.relationship("Meal")
 
-    def __init__(self,uid,gender,height,weight):
+    def __init__(self, uid, gender, height, weight, dob):
         self.uid = uid
         self.gender = gender
         self.height = height
         self.weight = weight
+        self.date_of_birth = dob
 
 
-class GoalEnum(enum.Enum):
+class GoalEnum(enum.IntEnum):
     WEIGHT_GOAL = 0
     CALORIE_GOAL = 1
 

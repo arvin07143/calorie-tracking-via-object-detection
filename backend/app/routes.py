@@ -1,13 +1,12 @@
 import base64
-import json
-import os
+import datetime
 from io import BytesIO
 
 import numpy as np
 import requests
 from PIL import Image
 from firebase_admin import auth
-from flask import Flask, request, jsonify
+from flask import request, jsonify
 from object_detection.utils.label_map_util import create_category_index_from_labelmap
 from werkzeug.exceptions import BadRequest
 
@@ -20,9 +19,8 @@ def hello_world():
 
 
 @app.route("/detection/predict/", methods=['GET', 'POST'])
+# TODO CHANGE TO GET ONLY
 def inference():
-    PATH_TO_LABELS = "label_map.pbtxt"
-    image_b64 = ""
     if auth_api_key(request.headers['Authorization']) is not None:
         try:
             data = request.json
@@ -31,29 +29,11 @@ def inference():
             image_b64 = request.args["b64"]
 
         received_image = Image.open(BytesIO(base64.b64decode(image_b64)))
-        np_img = np.array(received_image.convert('RGB'))
 
-        payload = {
-            "instances": [np_img.tolist()]
-        }
+        detector = FoodImageDetection(received_image)
+        results = detector.detect()
 
-        r = requests.post("http://localhost:8501/v1/models/my_model:predict", json=payload)
-        pred = (r.json())["predictions"][0]
-        detected_items_index = [i for i in range(len(pred['detection_scores'])) if pred['detection_scores'][i] > 0.5]
-
-        output_data = dict()
-        category_index = create_category_index_from_labelmap(PATH_TO_LABELS,
-                                                             use_display_name=True)
-
-        for i in detected_items_index:
-            out = dict()
-            out['detection_box'] = out.get('detection_box', []) + pred['detection_boxes'][i]
-            out['detection_class'] = out.get('detection_class', "") + category_index[pred['detection_classes'][i]][
-                'name']
-            out['detection_score'] = out.get('detection_score', 0) + pred['detection_scores'][i]
-            output_data["predictions"] = output_data.get("predictions", []) + [out]
-
-        return output_data
+        return jsonify(results)
 
 
 @app.route("/user/register/", methods=['POST'])
@@ -64,18 +44,22 @@ def register_new_user():
         gender = data['gender']
         height = data['height']
         weight = data['weight']
-        new_user = models.User(uid, gender, height, weight)
+        date_of_birth = datetime.datetime.strptime(data['dob'], "%Y-%m-%d")
+        new_user = models.User(uid, models.GenderEnum(gender), height, weight, date_of_birth)
         db.session.add(new_user)
         db.session.commit()
         return jsonify(message="User added successfully")
 
 
-@app.route("/user/retrieve", methods=['GET'])
+@app.route("/user/retrieve/", methods=['GET'])
 def get_user_data():
     uid = auth_api_key(request.headers['Authorization'])
     if uid is not None:
         user = models.User.query.get(uid)
-        return jsonify(uid=uid, gender=user.gender, height=user.height, weight=user.weight)
+        if user is not None:
+            return jsonify(uid=uid, gender=user.gender, height=user.height, weight=user.weight, dob=user.date_of_birth)
+        else:
+            return "", 204
 
 
 @app.route("/nutrition/calories", methods=['GET'])
@@ -86,24 +70,8 @@ def get_caloric_content():
     except (TypeError, BadRequest, KeyError) as ex:
         food_name = request.args['food-name']
 
-    print(request.headers)
-    url = app.config['NUTRITIONIX_API_URL']
-    api_params = {
-        "appId": app.config['NUTRITIONIX_APP_ID'],
-        "appKey": app.config['NUTRITIONIX_API_KEY'],
-        "query": food_name,
-        "fields": ['item_name', 'nf_calories']
-    }
-
-    print(json.dumps(api_params, indent=2))
-
-    r = requests.post(url=url, data=api_params)
-    calorie_data = r.json()
-
-    if int(calorie_data['total']) == 0:
-        return "Not found"
-
-    return calorie_data['hits'][0]['fields']  # we are only using the 1st element
+    estimator = CalorieEstimation(food_name)
+    return jsonify(calorie_list=estimator.calorie_list, total_calories=estimator.get_total_calories())
 
 
 def auth_api_key(id_token):
@@ -128,3 +96,61 @@ def handle_bad_request(e):
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0")
+
+
+class CalorieEstimation:
+    url = app.config['NUTRITIONIX_API_URL']
+    api_params = {
+        "appId": app.config['NUTRITIONIX_APP_ID'],
+        "appKey": app.config['NUTRITIONIX_API_KEY'],
+        "query": "",
+        "fields": ['item_name', 'nf_calories']
+    }
+
+    calorie_list = []
+
+    def __init__(self, food_list):
+        self.food_list = food_list
+        for item in self.food_list:
+            self.api_params['query'] = item
+            r = requests.post(url=self.url, data=self.api_params)
+            data = r.json()
+            if int(data['total']) == 0:
+                self.calorie_list.append(None)
+            else:
+                self.calorie_list.append(int(data['hits'][0]['fields']['nf_calories']))
+
+    def get_total_calories(self):
+        args = [c for c in self.calorie_list if c is not None]
+        return sum(args) if args else None
+
+
+class FoodImageDetection:
+    OBJECT_DETECTION_URL = app.config['TF_SERVER_URL']
+    PATH_TO_LABELS = app.config['PATH_TO_LABELS']
+
+    def __init__(self, image):
+        self.image_array = np.array(image.convert('RGB'))
+
+    def detect(self):
+        payload = {
+            "instances": [self.image_array.tolist()]
+        }
+
+        r = requests.post(self.OBJECT_DETECTION_URL, json=payload)
+        pred = (r.json())["predictions"][0]
+        detected_items_index = [i for i in range(len(pred['detection_scores'])) if pred['detection_scores'][i] > 0.5]
+
+        output_data = dict()
+        category_index = create_category_index_from_labelmap(self.PATH_TO_LABELS,
+                                                             use_display_name=True)
+
+        for i in detected_items_index:
+            out = dict()
+            out['detection_box'] = out.get('detection_box', []) + pred['detection_boxes'][i]
+            out['detection_class'] = out.get('detection_class', "") + category_index[pred['detection_classes'][i]][
+                'name']
+            out['detection_score'] = out.get('detection_score', 0) + pred['detection_scores'][i]
+            output_data["predictions"] = output_data.get("predictions", []) + [out]
+
+        return output_data
