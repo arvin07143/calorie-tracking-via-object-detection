@@ -49,6 +49,7 @@
                         app:singleSelection="true">
 
                         <Button
+                            android:id="@+id/btnMale"
                             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -56,6 +57,7 @@
                             android:text="@string/male" />
 
                         <Button
+                            android:id="@+id/btnFemale"
                             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -63,6 +65,7 @@
                             android:text="@string/female" />
 
                         <Button
+                            android:id="@+id/btnOtherGender"
                             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -100,6 +103,7 @@
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:layout_width="match_parent"
+                            android:focusable="false"
                             android:layout_height="wrap_content" />
                     </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
