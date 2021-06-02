@@ -10,4 +10,9 @@
         android:name="com.example.fyp.UserProfile"
         android:label="fragment_user_profile"
         tools:layout="@layout/fragment_user_profile" />
+    <fragment
+        android:id="@+id/home2"
+        android:name="com.example.fyp.Home"
+        android:label="fragment_home"
+        tools:layout="@layout/fragment_home" />
 </navigation>
