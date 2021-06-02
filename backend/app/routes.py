@@ -6,7 +6,7 @@ import numpy as np
 import requests
 from PIL import Image
 from firebase_admin import auth
-from flask import request, jsonify
+from flask import request, jsonify, abort
 from object_detection.utils.label_map_util import create_category_index_from_labelmap
 from werkzeug.exceptions import BadRequest
 
@@ -18,7 +18,7 @@ def hello_world():
     return "Hello World"
 
 
-@app.route("/detection/predict/", methods=['GET', 'POST'])
+@app.route("/detection/predict/", methods=['GET'])
 # TODO CHANGE TO GET ONLY
 def inference():
     if auth_api_key(request.headers['Authorization']) is not None:
@@ -36,9 +36,12 @@ def inference():
         return jsonify(results)
 
 
-@app.route("/user/register/", methods=['POST'])
+@app.route("/users/", methods=['POST'])
 def register_new_user():
-    uid = auth_api_key(request.headers['Authorization'])
+    try:
+        uid = auth_api_key(request.headers['Authorization'])
+    except KeyError:
+        abort(401)
     if uid is not None:
         data = request.json
         gender = data['gender']
@@ -51,15 +54,22 @@ def register_new_user():
         return jsonify(message="User added successfully")
 
 
-@app.route("/user/retrieve/", methods=['GET'])
-def get_user_data():
-    uid = auth_api_key(request.headers['Authorization'])
-    if uid is not None:
-        user = models.User.query.get(uid)
+@app.route("/users/<uid>", methods=['GET'])
+def get_user_data(uid):
+    try:
+        auth_uid = auth_api_key(request.headers['Authorization'])
+        user = None
+        if uid == "me":
+            user = models.User.query.get(auth_uid)
+        elif uid == auth_uid:
+            user = models.User.query.get(uid)
+
         if user is not None:
             return jsonify(uid=uid, gender=user.gender, height=user.height, weight=user.weight, dob=user.date_of_birth)
         else:
-            return "", 204
+            abort(404)
+    except KeyError:
+        abort(401)
 
 
 @app.route("/nutrition/calories", methods=['GET'])
@@ -127,7 +137,7 @@ class CalorieEstimation:
 
 class FoodImageDetection:
     OBJECT_DETECTION_URL = app.config['TF_SERVER_URL']
-    PATH_TO_LABELS = app.config['PATH_TO_LABELS']
+    PATH_TO_LABELS = app.config['PATH_LABELS']
 
     def __init__(self, image):
         self.image_array = np.array(image.convert('RGB'))
