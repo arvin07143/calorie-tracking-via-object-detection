@@ -12,7 +12,7 @@
         tools:layout="@layout/fragment_user_profile" />
     <fragment
         android:id="@+id/home2"
-        android:name="com.example.fyp.Home"
+        android:name="com.example.fyp.HomeFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_home" />
 </navigation>
