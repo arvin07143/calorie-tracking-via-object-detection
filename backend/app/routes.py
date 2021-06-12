@@ -12,6 +12,8 @@ from werkzeug.exceptions import BadRequest
 
 from . import app, models, db
 
+app.json_encoder = models.CustomJSONEncoder
+
 
 @app.route("/")
 def hello_world():
@@ -65,11 +67,19 @@ def get_user_data(uid):
             user = models.User.query.get(uid)
 
         if user is not None:
-            return jsonify(uid=uid, gender=user.gender, height=user.height, weight=user.weight, dob=user.date_of_birth)
+            print(type(user.date_of_birth))
+            return jsonify(user)
         else:
             abort(404)
     except KeyError:
         abort(401)
+
+
+@app.route("/users/<uid>/meals/", methods=['GET'])
+def get_meal_date(uid):
+    meals = models.Meal.query.all()
+    # TODO
+    return jsonify(meals)
 
 
 @app.route("/nutrition/calories", methods=['GET'])

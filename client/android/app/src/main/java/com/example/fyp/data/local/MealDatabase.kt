@@ -1,11 +1,11 @@
-package com.example.fyp.data
+package com.example.fyp.data.local
 
 import android.content.Context
-import androidx.room.Database
-import androidx.room.Room
-import androidx.room.RoomDatabase
+import androidx.room.*
+import com.example.fyp.data.entities.Meal
 
-@Database(entities = [Meal::class], version = 1)
+@Database(entities = [Meal::class], version = 3, exportSchema = false)
+@TypeConverters(Converter::class)
 abstract class MealDatabase : RoomDatabase() {
     abstract fun mealDao(): MealDAO
 

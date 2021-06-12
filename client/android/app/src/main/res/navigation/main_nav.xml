@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main_nav"
-    app:startDestination="@id/userProfile">
+    app:startDestination="@id/home2">
 
     <fragment
         android:id="@+id/userProfile"
@@ -14,5 +14,9 @@
         android:id="@+id/home2"
         android:name="com.example.fyp.HomeFragment"
         android:label="fragment_home"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_home2_to_userProfile"
+            app:destination="@id/userProfile" />
+    </fragment>
 </navigation>

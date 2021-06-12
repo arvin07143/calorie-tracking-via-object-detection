@@ -6,11 +6,11 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.fyp.R
-import com.example.fyp.data.Meal
+import com.example.fyp.data.entities.Meal
 
 class MealItemAdapter : RecyclerView.Adapter<MealItemAdapter.ItemViewHolder>() {
 
-    private var dataset = listOf<Meal>()
+    var dataset = listOf<Meal>()
         set(value){
             field = value
             notifyDataSetChanged()
@@ -30,9 +30,9 @@ class MealItemAdapter : RecyclerView.Adapter<MealItemAdapter.ItemViewHolder>() {
 
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
         val item = dataset[position]
-        item.foodList.forEachIndexed{i,element ->
+        item.mealContent.food_list.forEachIndexed{i,element ->
             holder.itemName.text = element
-            holder.itemCalories.text = item.calorieList[i].toString()
+            holder.itemCalories.text = item.mealContent.calorie_list[i].toString()
         }
     }
 

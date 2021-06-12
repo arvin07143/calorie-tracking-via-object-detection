@@ -21,23 +21,14 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import dagger.hilt.android.AndroidEntryPoint
 
-
+@AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
-
-    private lateinit var auth: FirebaseAuth
-    private var token: String? = null
-    private lateinit var googleSignInClient: GoogleSignInClient
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val binding = ActivityLoginBinding.inflate(layoutInflater)
-        auth = Firebase.auth
-
-        val gso =
-            GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id)).build()
-        googleSignInClient = GoogleSignIn.getClient(this, gso)
 
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
@@ -47,22 +38,4 @@ class LoginActivity : AppCompatActivity() {
         Log.e("a","ACTIVITY CREATE")
     }
 
-    override fun onStart() {
-        super.onStart()
-//        Log.e("a","ACTIVITY START")
-//        val currentUser = auth.currentUser
-//        if (currentUser != null) {
-//            Navigation.findNavController(this,R.id.nav_host_fragment).navigate(R.id.action_loginFragment_to_mainActivity)
-//        }
-    }
-
-    private fun createEmailAccount(email: String, password: String) {
-        auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener {
-            if (it.isSuccessful) {
-                val user = auth.currentUser
-            } else {
-                TODO()
-            }
-        }
-    }
 }
