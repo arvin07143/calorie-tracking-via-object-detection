@@ -1,7 +1,6 @@
 package com.example.fyp.utils
 
 import android.util.Patterns
-import com.google.android.material.textfield.TextInputLayout
 
 object Utils {
 

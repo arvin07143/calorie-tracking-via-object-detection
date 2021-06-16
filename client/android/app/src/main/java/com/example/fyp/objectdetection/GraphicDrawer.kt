@@ -5,7 +5,7 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
 import android.util.Log
-import com.example.fyp.utils.GraphicOverlay
+import com.example.fyp.camera.GraphicOverlay
 import java.util.*
 import kotlin.math.max
 import kotlin.math.min
@@ -37,9 +37,9 @@ class GraphicDrawer constructor(
     }
 
 
-    override fun draw(canvas: Canvas?) {
+    override fun draw(canvas: Canvas) {
         val colorID = 2
-        var textWidth =
+        val textWidth =
             textPaints[colorID].measureText(detectedObject.objectLabel)
         val lineHeight = TEXT_SIZE + STROKE_WIDTH
         var yLabelOffset = -lineHeight
@@ -57,7 +57,7 @@ class GraphicDrawer constructor(
         rect.right = max(x0, x1)
         rect.top = translateY(rect.top)
         rect.bottom = translateY(rect.bottom)
-        canvas!!.drawRect(rect, boxPaints[9])
+        canvas.drawRect(rect, boxPaints[9])
 
         // Draws other object info.
         canvas.drawRect(
