@@ -18,6 +18,8 @@
                 style="@style/Widget.MaterialComponents.Toolbar.Surface"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
+                app:navigationIcon="@drawable/ic_menu_24dp"
+                app:title="Hi"
                 app:menu="@menu/top_nav" />
 
         </com.google.android.material.appbar.AppBarLayout>

@@ -1,15 +1,10 @@
 package com.example.fyp.data.entities
 
-import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.squareup.moshi.FromJson
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
-import com.squareup.moshi.ToJson
-import java.io.Serializable
-import java.time.LocalDateTime
 import java.util.*
 
 @Entity(tableName = "meals")

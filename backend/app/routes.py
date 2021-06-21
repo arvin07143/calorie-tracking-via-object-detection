@@ -23,19 +23,18 @@ def hello_world():
 @app.route("/detection/predict/", methods=['GET'])
 # TODO CHANGE TO GET ONLY
 def inference():
-    if auth_api_key(request.headers['Authorization']) is not None:
-        try:
-            data = request.json
-            image_b64 = data['b64']
-        except (TypeError, BadRequest, KeyError):
-            image_b64 = request.args["b64"]
+    try:
+        data = request.json
+        image_b64 = data['b64']
+    except (TypeError, BadRequest, KeyError):
+        image_b64 = request.args["b64"]
 
-        received_image = Image.open(BytesIO(base64.b64decode(image_b64)))
+    received_image = Image.open(BytesIO(base64.b64decode(image_b64)))
 
-        detector = FoodImageDetection(received_image)
-        results = detector.detect()
+    detector = FoodImageDetection(received_image)
+    results = detector.get_results()
 
-        return jsonify(results)
+    return jsonify(results)
 
 
 @app.route("/users/", methods=['POST'])
@@ -53,7 +52,7 @@ def register_new_user():
         new_user = models.User(uid, models.GenderEnum(gender), height, weight, date_of_birth)
         db.session.add(new_user)
         db.session.commit()
-        return jsonify(message="User added successfully")
+        return "User added successfully", 200
 
 
 @app.route("/users/<uid>", methods=['GET'])
@@ -80,6 +79,21 @@ def get_meal_date(uid):
     meals = models.Meal.query.all()
     # TODO
     return jsonify(meals)
+
+
+@app.route("/users/<uid>/meals/", methods=['POST'])
+def add_new_meal(uid):
+    data = request.json
+    meal_content = data["meal_content"]
+    meal_time = data["meal_time"]
+    meal_type = data["meal_type"]
+    new_meal = models.Meal(meal_content=meal_content, user_id=uid, meal_type=models.MealTypeEnum(meal_type),
+                           meal_time=meal_time)
+    # TODO
+    db.session.add(new_meal)
+    db.session.commit()
+
+    return "Meal Added Successfully", 200
 
 
 @app.route("/nutrition/calories", methods=['GET'])
@@ -142,17 +156,17 @@ class CalorieEstimation:
 
     def get_total_calories(self):
         args = [c for c in self.calorie_list if c is not None]
-        return sum(args) if args else None
+        return sum(args) if args else 0
 
 
 class FoodImageDetection:
     OBJECT_DETECTION_URL = app.config['TF_SERVER_URL']
     PATH_TO_LABELS = app.config['PATH_LABELS']
 
+    output = dict()
+
     def __init__(self, image):
         self.image_array = np.array(image.convert('RGB'))
-
-    def detect(self):
         payload = {
             "instances": [self.image_array.tolist()]
         }
@@ -161,7 +175,6 @@ class FoodImageDetection:
         pred = (r.json())["predictions"][0]
         detected_items_index = [i for i in range(len(pred['detection_scores'])) if pred['detection_scores'][i] > 0.5]
 
-        output_data = dict()
         category_index = create_category_index_from_labelmap(self.PATH_TO_LABELS,
                                                              use_display_name=True)
 
@@ -171,6 +184,20 @@ class FoodImageDetection:
             out['detection_class'] = out.get('detection_class', "") + category_index[pred['detection_classes'][i]][
                 'name']
             out['detection_score'] = out.get('detection_score', 0) + pred['detection_scores'][i]
-            output_data["predictions"] = output_data.get("predictions", []) + [out]
+            self.output["predictions"] = self.output.get("predictions", []) + [out]
 
-        return output_data
+    def get_results(self):
+        data = CalorieEstimation(self.output)
+        for item in data.calorie_list:
+            self.output["predictions"][data.calorie_list.index(item)]["calories"] = item
+
+        self.output["total_calories"] = data.get_total_calories()
+
+        return self.output
+
+
+class BarcodeDetection:
+    BARCODE_LOOKUP_API_ENDPOINT = "https://api.upcitemdb.com/prod/trial/lookup"
+
+    def __init__(self, barcode_string):
+        self.barcode = barcode_string

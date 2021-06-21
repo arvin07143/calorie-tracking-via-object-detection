@@ -4,7 +4,7 @@
     package="com.example.fyp">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <application
         android:name=".App"
@@ -16,10 +16,15 @@
         android:theme="@style/Theme.Fyp"
         android:usesCleartextTraffic="true"
         tools:targetApi="m">
+        <activity android:name=".objectdetection.ObjectDetectionActivity"
+            android:screenOrientation="fullSensor">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".barcodedetection.BarcodeScanningActivity"
-            android:label="@string/title_activity_barcode_scanning"
-            android:theme="@style/Theme.Fyp.NoActionBar">
+            android:label="@string/title_activity_barcode_scanning">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>

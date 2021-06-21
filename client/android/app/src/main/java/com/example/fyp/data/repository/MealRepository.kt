@@ -1,5 +1,6 @@
 package com.example.fyp.data.repository
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import com.example.fyp.AppExecutors
 import com.example.fyp.data.entities.Meal
@@ -7,13 +8,7 @@ import com.example.fyp.data.local.MealDAO
 import com.example.fyp.data.remote.MealService
 import com.example.fyp.utils.NetworkBoundResource
 import com.example.fyp.utils.Resource
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.withContext
-import retrofit2.Call
 import javax.inject.Inject
-import javax.inject.Singleton
 
 class MealRepository @Inject constructor(
     private val appExecutors: AppExecutors,
@@ -22,16 +17,17 @@ class MealRepository @Inject constructor(
 ) {
 
     companion object {
-        private val TAG = "REPO"
+        private const val TAG = "REPO"
     }
+
     fun getAllMeals(): LiveData<Resource<List<Meal>>> {
         return object : NetworkBoundResource<List<Meal>, List<Meal>>(appExecutors) {
             override fun saveCallResult(item: List<Meal>) {
-                localSource.insertFromRemote(*item.map{it}.toTypedArray())
+                localSource.insertFromRemote(*item.map { it }.toTypedArray())
             }
 
             override fun shouldFetch(data: List<Meal>?): Boolean {
-                return false //TODO
+                return false //ALMOST NEVER FETCH BECAUSE ONLY USED FOR SYNC TODO()
             }
 
             override fun loadFromDb(): LiveData<List<Meal>> {
@@ -39,6 +35,7 @@ class MealRepository @Inject constructor(
             }
 
             override fun createCall(): LiveData<Resource<List<Meal>>> {
+                Log.e("CALL","CREATED")
                 return remoteSource.getAllMeals("me")
             }
 

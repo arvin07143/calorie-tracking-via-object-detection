@@ -103,7 +103,7 @@ class LoginFragment : Fragment() {
             val task = GoogleSignIn.getSignedInAccountFromIntent(data)
             try {
                 // Google Sign In was successful, authenticate with Firebase
-                val account = task.getResult(ApiException::class.java)!!
+                val account = task.getResult(ApiException::class.java)
                 Log.d(TAG, "firebaseAuthWithGoogle:" + account.id)
                 firebaseAuthWithGoogle(account.idToken!!)
             } catch (e: ApiException) {
@@ -158,6 +158,9 @@ class LoginFragment : Fragment() {
                                 putBoolean("SIGNED IN", true)
                                 apply()
                             }
+                            findNavController().navigate(R.id.action_loginFragment_to_mainActivity)
+                        } else{
+                            findNavController().navigate(R.id.action_loginFragment_to_registerInformationFragment)
                         }
                     }
                 }

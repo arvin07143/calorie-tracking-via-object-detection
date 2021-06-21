@@ -9,11 +9,6 @@ import androidx.fragment.app.Fragment
 class UserProfile : Fragment() {
 
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -22,7 +17,5 @@ class UserProfile : Fragment() {
         return inflater.inflate(R.layout.fragment_user_profile, container, false)
     }
 
-    companion object {
-
-    }
+    companion object
 }

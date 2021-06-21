@@ -132,7 +132,5 @@ class RegisterInformationFragment : Fragment() {
         return binding.root
     }
 
-    companion object {
-
-    }
+    companion object
 }

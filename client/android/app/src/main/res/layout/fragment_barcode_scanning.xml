@@ -4,21 +4,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.camera.view.PreviewView
-        android:id="@+id/viewfinder"
+    <include
+        android:id="@+id/barcode_scanning_view"
+        layout="@layout/camera_basic_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-    <com.example.fyp.camera.GraphicOverlay
-        android:id="@+id/overlay"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_constraintStart_toStartOf="@id/viewfinder"
-        app:layout_constraintEnd_toEndOf="@id/viewfinder"
-        app:layout_constraintBottom_toBottomOf="@id/viewfinder"
-        app:layout_constraintTop_toTopOf="@id/viewfinder" />
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

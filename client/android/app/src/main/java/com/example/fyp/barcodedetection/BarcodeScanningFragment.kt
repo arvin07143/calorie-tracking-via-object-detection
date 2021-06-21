@@ -2,12 +2,15 @@ package com.example.fyp.barcodedetection
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -20,7 +23,7 @@ import java.util.concurrent.Executors
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
  */
-class BarcodeScanningFragment : Fragment(), BarcodeListener{
+class BarcodeScanningFragment : Fragment(), BarcodeListener {
 
     private lateinit var binding: FragmentBarcodeScanningBinding
     private lateinit var barcodeScanner: MyBarcodeScanner
@@ -29,14 +32,30 @@ class BarcodeScanningFragment : Fragment(), BarcodeListener{
 
     /** Blocking camera and inference operations are performed using this executor. */
     private lateinit var cameraExecutor: ExecutorService
+    private var flashMode = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentBarcodeScanningBinding.inflate(inflater, container, false)
-        barcodeAnalyzer = BarcodeAnalyzer(graphicOverlay = binding.overlay).apply {
+        barcodeAnalyzer = BarcodeAnalyzer(graphicOverlay = binding.barcodeScanningView.overlay).apply {
             this.barcodeResultListener = this@BarcodeScanningFragment
+        }
+
+        binding.barcodeScanningView.cameraTopMenu.closeButton.setOnClickListener {
+            activity?.finish()
+        }
+
+        binding.barcodeScanningView.cameraTopMenu.flashButton.setOnClickListener {
+            flashMode = !flashMode
+            if (barcodeScanner.camera.cameraInfo.hasFlashUnit()) {
+                barcodeScanner.camera.cameraControl.enableTorch(flashMode); // or false
+            } else {
+                Log.e("CAMERA", "NO FLASH")
+                Toast.makeText(requireContext(), "No flash on this device", Toast.LENGTH_SHORT)
+                    .show()
+            }
         }
         return binding.root
     }
@@ -54,17 +73,18 @@ class BarcodeScanningFragment : Fragment(), BarcodeListener{
             barcodeScanner = MyBarcodeScanner.Builder(requireContext())
                 .setLifecycleOwner(this)
                 .setImageAnalyzer(barcodeAnalyzer)
+
                 .build()
 
             barcodeScanner.addFutureListener(Runnable {
-                barcodeScanner.setupCamera(requireActivity().windowManager, binding.viewfinder)
+                barcodeScanner.setupCamera(requireActivity().windowManager, binding.barcodeScanningView.viewfinder)
             }, ContextCompat.getMainExecutor(requireContext()))
-        } else{
+        } else {
             requestPermissions(REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
         }
 
-        viewModel.shouldScan.observe(viewLifecycleOwner, Observer{
-            if (it == true){
+        viewModel.shouldScan.observe(viewLifecycleOwner, Observer {
+            if (it == true) {
                 barcodeScanner.startScanning()
             }
         })
@@ -83,17 +103,12 @@ class BarcodeScanningFragment : Fragment(), BarcodeListener{
             .build()
 
         barcodeScanner.addFutureListener(Runnable {
-            barcodeScanner.setupCamera(requireActivity().windowManager, binding.viewfinder)
+            barcodeScanner.setupCamera(requireActivity().windowManager, binding.barcodeScanningView.viewfinder)
         }, ContextCompat.getMainExecutor(requireContext()))
     }
 
     companion object {
         fun newInstance() = BarcodeScanningFragment()
-
-        // We only need to analyze the part of the image that has text, so we set crop percentages
-        // to avoid analyze the entire image from the live camera feed.
-        const val DESIRED_WIDTH_CROP_PERCENT = 8
-        const val DESIRED_HEIGHT_CROP_PERCENT = 74
 
         // This is an arbitrary number we are using to keep tab of the permission
         // request. Where an app has multiple context for requesting permission,
@@ -102,14 +117,12 @@ class BarcodeScanningFragment : Fragment(), BarcodeListener{
 
         // This is an array of all the permission specified in the manifest
         private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
-        private const val RATIO_4_3_VALUE = 4.0 / 3.0
-        private const val RATIO_16_9_VALUE = 16.0 / 9.0
         private const val TAG = "MainFragment"
     }
 
     override fun onBarcodesDetected(barcodes: List<Barcode>) {
-        for(barcode in barcodes){
-            Log.e(TAG,barcode.rawValue ?: "")
+        for (barcode in barcodes) {
+            Log.e(TAG, barcode.rawValue ?: "")
         }
     }
 
@@ -120,7 +133,10 @@ class BarcodeScanningFragment : Fragment(), BarcodeListener{
 
     override fun onBarcodeProcessed(barcode: Barcode) {
         barcodeScanner.stopScanning()
-        //TODO()
+        val data = Intent()
+        data.putExtra("VAL", barcode.rawValue)
+        requireActivity().setResult(Activity.RESULT_OK, data)
+        requireActivity().finish()
         viewModel.shouldScan.value = false
     }
 

@@ -1,9 +1,6 @@
 package com.example.fyp.dependency
 
 import android.content.Context
-import android.graphics.RectF
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.room.Room
 import com.example.fyp.AppExecutors
 import com.example.fyp.data.local.MealDAO
@@ -12,9 +9,8 @@ import com.example.fyp.data.remote.MealService
 import com.example.fyp.data.remote.WebAPI
 import com.example.fyp.data.repository.MealRepository
 import com.example.fyp.objectdetection.DetectedObjectConverter
-import com.example.fyp.utils.FirebaseUserIdTokenInterceptor
+import com.example.fyp.utils.AuthTokenProvider
 import com.example.fyp.utils.LiveDataCallAdapterFactory
-import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.squareup.moshi.Moshi
@@ -28,8 +24,8 @@ import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
-import java.time.LocalDateTime
 import java.util.*
+import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
 @Module
@@ -40,8 +36,12 @@ object AppModule {
     fun provideGson(): Gson = GsonBuilder().create()
 
     @Provides
-    fun provideOKHTTP():OkHttpClient = OkHttpClient.Builder()
-        .addInterceptor(FirebaseUserIdTokenInterceptor())
+    fun provideOKHTTP(): OkHttpClient = OkHttpClient.Builder()
+        .readTimeout(60, TimeUnit.SECONDS)
+        .callTimeout(60, TimeUnit.SECONDS)
+        .connectTimeout(60, TimeUnit.SECONDS)
+        .writeTimeout(60, TimeUnit.SECONDS)
+        .addInterceptor(AuthTokenProvider())
         .build()
 
     @Singleton
@@ -69,7 +69,7 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun provideWebAPI(retrofit: Retrofit): WebAPI{
+    fun provideWebAPI(retrofit: Retrofit): WebAPI {
         return retrofit.create(WebAPI::class.java)
     }
 
@@ -91,7 +91,7 @@ object AppModule {
     fun provideRepository(
         appExecutors: AppExecutors,
         remoteDataSource: MealService,
-        localDataSource: MealDAO
+        localDataSource: MealDAO,
     ): MealRepository {
         return MealRepository(appExecutors, remoteDataSource, localDataSource)
     }

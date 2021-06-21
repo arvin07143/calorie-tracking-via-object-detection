@@ -10,7 +10,7 @@ import okhttp3.Response
 import okio.IOException
 
 
-class FirebaseUserIdTokenInterceptor : Interceptor {
+class AuthTokenProvider : Interceptor {
     @Throws(IOException::class)
     override fun intercept(chain: Interceptor.Chain): Response {
         val request: Request = chain.request()

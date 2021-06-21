@@ -1,11 +1,9 @@
 package com.example.fyp.data.remote
 
-import androidx.lifecycle.LiveData
 import com.example.fyp.data.entities.UserInformation
 import com.example.fyp.objectdetection.DetectedObjectList
 import retrofit2.Call
 import retrofit2.http.GET
-import retrofit2.http.POST
 import retrofit2.http.Query
 
 interface WebAPI {

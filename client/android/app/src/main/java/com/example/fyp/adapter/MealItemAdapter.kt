@@ -10,11 +10,7 @@ import com.example.fyp.data.entities.Meal
 
 class MealItemAdapter : RecyclerView.Adapter<MealItemAdapter.ItemViewHolder>() {
 
-    var dataset = listOf<Meal>()
-        set(value){
-            field = value
-            notifyDataSetChanged()
-        }
+    var dataset = arrayListOf<Meal>()
 
     class ItemViewHolder(itemview: View) : RecyclerView.ViewHolder(itemview){
         val itemName:TextView = itemView.findViewById(R.id.list_item_name)

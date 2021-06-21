@@ -9,27 +9,29 @@ import com.squareup.moshi.ToJson
 @JsonClass(generateAdapter = true)
 data class DetectedObject(
     @Json(name = "detection_class")
-    val objectLabel : String,
+    val objectLabel: String,
     @Json(name = "detection_box")
-    val boundingBox : RectF,
+    val boundingBox: RectF,
     @Json(name = "detection_score")
-    val confidence : Float
+    val confidence: Float,
+    @Json(name = "calories")
+    val calories: Int?,
 )
 
 @JsonClass(generateAdapter = true)
 data class DetectedObjectList(
     @Json(name = "predictions")
-    val objectList: List<DetectedObject>
+    var objectList: List<DetectedObject>,
 )
 
-class DetectedObjectConverter{
+class DetectedObjectConverter {
     @ToJson
-    fun RectToList(rect: RectF):List<Float>{
-        return listOf(rect.top,rect.bottom,rect.left,rect.right)
+    fun rectToList(rect: RectF): List<Float> {
+        return listOf(rect.top, rect.bottom, rect.left, rect.right)
     }
 
     @FromJson
-    fun ListToRect(floatList: List<Float>):RectF{
-        return RectF(floatList[0],floatList[1],floatList[2],floatList[3])
+    fun listToRect(floatList: List<Float>): RectF {
+        return RectF(floatList[0], floatList[1], floatList[2], floatList[3])
     }
 }

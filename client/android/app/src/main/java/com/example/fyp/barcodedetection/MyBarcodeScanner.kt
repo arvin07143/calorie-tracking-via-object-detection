@@ -5,6 +5,7 @@ import android.content.Context
 import android.util.Size
 import android.view.WindowManager
 import androidx.annotation.RequiresPermission
+import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
@@ -17,21 +18,24 @@ import java.util.concurrent.Executor
 
 class MyBarcodeScanner constructor(
     _context: Context,
-    private val _imageHeight:Int,
-    private val _imageWidth:Int,
-    private val _requiredCameraLens:Int,
-    private val _imageBackpressureStrategy:Int,
+    private val _imageHeight: Int,
+    private val _imageWidth: Int,
+    private val _requiredCameraLens: Int,
+    private val _imageBackpressureStrategy: Int,
     private val _analyzer: ImageAnalysis.Analyzer,
     private val _imageExecutor: Executor,
-    private val _lifecycleOwner: LifecycleOwner){
+    private val _lifecycleOwner: LifecycleOwner
+) {
 
-    private val _cameraProviderFuture : ListenableFuture<ProcessCameraProvider> = ProcessCameraProvider.getInstance(_context)
+    private val _cameraProviderFuture: ListenableFuture<ProcessCameraProvider> =
+        ProcessCameraProvider.getInstance(_context)
     private lateinit var _imageAnalyzer: ImageAnalysis
     private lateinit var _cameraProvider: ProcessCameraProvider
     private lateinit var _preview: Preview
     private lateinit var _cameraSelector: CameraSelector
+    lateinit var camera: Camera
 
-    fun setupCamera(windowManager: WindowManager, previewView: PreviewView){
+    fun setupCamera(windowManager: WindowManager, previewView: PreviewView) {
 
         _cameraProvider = _cameraProviderFuture.get()
 
@@ -47,42 +51,43 @@ class MyBarcodeScanner constructor(
     /**
      * Starts the image analyzer if it has been stopped. Analyzer starts automatically when calling setupCamera
      */
-    fun startScanning(){
+    fun startScanning() {
         _imageAnalyzer = ImageAnalysis.Builder()
             .setTargetResolution(Size(_imageWidth, _imageHeight))
             .setBackpressureStrategy(_imageBackpressureStrategy)
             .build()
 
-        _imageAnalyzer.setAnalyzer(_imageExecutor,_analyzer)
+        _imageAnalyzer.setAnalyzer(_imageExecutor, _analyzer)
 
         _cameraProvider.bindToLifecycle(_lifecycleOwner, _cameraSelector, _imageAnalyzer)
     }
 
+
     /**
      * Stops the image analyzer
      */
-    fun stopScanning(){
+    fun stopScanning() {
         _cameraProvider.unbind(_imageAnalyzer)
     }
 
     /**
      * Stops the camera preview
      */
-    fun stopPreview(){
+    fun stopPreview() {
         _cameraProvider.unbind(_preview)
     }
 
     /**
      * Starts the camera preview after it has been stopped
      */
-    private fun startPreview(windowManager: WindowManager, previewView: PreviewView){
+    private fun startPreview(windowManager: WindowManager, previewView: PreviewView) {
         _preview = Preview.Builder()
             .setTargetRotation(windowManager.defaultDisplay.rotation)
             .build()
 
         _preview.setSurfaceProvider(previewView.surfaceProvider)
 
-        _cameraProvider.bindToLifecycle(_lifecycleOwner, _cameraSelector, _preview)
+        camera = _cameraProvider.bindToLifecycle(_lifecycleOwner, _cameraSelector, _preview)
     }
 
     /**
@@ -91,23 +96,23 @@ class MyBarcodeScanner constructor(
      * complete or, if the computation is already complete, immediately.
      * @see ListenableFuture.addListener
      */
-    fun addFutureListener(runnable: Runnable, executor: Executor){
-        _cameraProviderFuture.addListener(runnable,executor)
+    fun addFutureListener(runnable: Runnable, executor: Executor) {
+        _cameraProviderFuture.addListener(runnable, executor)
     }
 
-    data class Builder(private val context: Context){
+    data class Builder(private val context: Context) {
 
-        private val DEFAULT_IMAGE_HEIGHT:Int = 640
-        private val DEFAULT_IMAGE_WIDTH:Int = 480
+        private val DEFAULT_IMAGE_HEIGHT: Int = 640
+        private val DEFAULT_IMAGE_WIDTH: Int = 480
 
-        private var _imageHeight:Int = DEFAULT_IMAGE_HEIGHT
-        private var _imageWidth:Int = DEFAULT_IMAGE_WIDTH
-        private var _requiredCameraLens:Int = CameraSelector.LENS_FACING_BACK
-        private var _imageBackpressureStrategy:Int = ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST
+        private var _imageHeight: Int = DEFAULT_IMAGE_HEIGHT
+        private var _imageWidth: Int = DEFAULT_IMAGE_WIDTH
+        private var _requiredCameraLens: Int = CameraSelector.LENS_FACING_BACK
+        private var _imageBackpressureStrategy: Int = ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST
 
-        private lateinit var _analyzer:ImageAnalysis.Analyzer
-        private lateinit var _imageExecutor:Executor
-        private lateinit var _lifecycleOwner:LifecycleOwner
+        private lateinit var _analyzer: ImageAnalysis.Analyzer
+        private lateinit var _imageExecutor: Executor
+        private lateinit var _lifecycleOwner: LifecycleOwner
 
         /**
          * Optionally set the image capture dimensions of the analyzer.
@@ -117,19 +122,18 @@ class MyBarcodeScanner constructor(
          * @param height Requested image height
          * @param width Requested image width
          */
-        fun setImageDimensions(height:Int, width:Int): Builder {
+        fun setImageDimensions(height: Int, width: Int): Builder {
             _imageHeight = height
             _imageWidth = width
             return this
         }
 
 
-
         /**
          * Optionally sets the required camera lens. Default is CameraSelector.LENS_FACING_BACK
          * @see CameraSelector.LENS_FACING_BACK
          */
-        fun setRequiredCameraLens(lens:Int): Builder {
+        fun setRequiredCameraLens(lens: Int): Builder {
             _requiredCameraLens = lens
             return this
         }
@@ -139,7 +143,10 @@ class MyBarcodeScanner constructor(
          *
          * @param analyzer Analyzer for processing frames from the camera
          */
-        fun setImageAnalyzer(analyzer:ImageAnalysis.Analyzer, executor:Executor = ContextCompat.getMainExecutor(context)): Builder {
+        fun setImageAnalyzer(
+            analyzer: ImageAnalysis.Analyzer,
+            executor: Executor = ContextCompat.getMainExecutor(context)
+        ): Builder {
             _analyzer = analyzer
             _imageExecutor = executor
             return this
@@ -148,7 +155,7 @@ class MyBarcodeScanner constructor(
         /**
          * Sets the lifecycle owner of the camera provider
          */
-        fun setLifecycleOwner(lifecycleOwner:LifecycleOwner): Builder {
+        fun setLifecycleOwner(lifecycleOwner: LifecycleOwner): Builder {
             _lifecycleOwner = lifecycleOwner
             return this
         }
@@ -158,7 +165,7 @@ class MyBarcodeScanner constructor(
          * you must call close() on the image for the analyze method to be called again
          * @see ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST
          */
-        fun setImageBackpressureStrategy(backpressureStrategy:Int): Builder {
+        fun setImageBackpressureStrategy(backpressureStrategy: Int): Builder {
             _imageBackpressureStrategy = backpressureStrategy
             return this
         }
@@ -169,11 +176,11 @@ class MyBarcodeScanner constructor(
         @RequiresPermission(Manifest.permission.CAMERA)
         fun build(): MyBarcodeScanner {
 
-            if(!::_analyzer.isInitialized){
+            if (!::_analyzer.isInitialized) {
                 throw IllegalArgumentException("Must provide an analyzer")
             }
 
-            if(!::_lifecycleOwner.isInitialized){
+            if (!::_lifecycleOwner.isInitialized) {
                 throw IllegalArgumentException("Must provide a lifecycle owner")
             }
             return MyBarcodeScanner(
