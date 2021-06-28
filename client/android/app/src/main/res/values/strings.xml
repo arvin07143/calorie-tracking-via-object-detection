@@ -28,4 +28,9 @@
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
     <string name="confirm">Confirm</string>
+
+    <string-array name="goal_type">
+        <item>Weight</item>
+        <item>Calorie</item>
+    </string-array>
 </resources>

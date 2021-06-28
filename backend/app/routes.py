@@ -6,8 +6,10 @@ import numpy as np
 import requests
 from PIL import Image
 from firebase_admin import auth
-from flask import request, jsonify, abort
+from flask import jsonify
+from flask_sqlalchemy import *
 from object_detection.utils.label_map_util import create_category_index_from_labelmap
+from sqlalchemy import desc
 from werkzeug.exceptions import BadRequest
 
 from . import app, models, db
@@ -77,23 +79,79 @@ def get_user_data(uid):
 @app.route("/users/<uid>/meals/", methods=['GET'])
 def get_meal_date(uid):
     meals = models.Meal.query.all()
-    # TODO
-    return jsonify(meals)
+    output = dict()
+    output["user_id"] = uid
+    output_meal_list = list()
+    for meal in meals:
+        meal_details = dict()
+        meal_details["meal_id"] = meal.id
+        meal_details["meal_time"] = meal.meal_time
+        meal_details["meal_type"] = meal.meal_type
+        meal_details["meal_content"] = list()
+        meal_items = models.MealItem.query.filter_by(meal_id=meal.id).all()
+        for item in meal_items:
+            meal_dict = dict()
+            meal_dict["item_name"] = item.item_name
+            meal_dict["calories"] = item.item_calorie
+            meal_details["meal_content"].append(meal_dict)
+
+        output_meal_list.append(meal_details)
+    output["meals"] = output_meal_list
+
+    return output
+
+
+@app.route("/users/<uid>/<meal_id>/", methods=['POST'])
+def add_meal_item(uid, meal_id):
+    meals = models.Meal.query.get_or_404(meal_id)
+    try:
+        data = request.json
+        print(data)
+        if type(data) is str:
+            data = list(data)
+
+        for item in data:
+            item_name = item["item_name"]
+            item_calorie = item["calories"]
+            new_meal_item = models.MealItem(item_name=item_name, item_calorie=item_calorie)
+            meals.meal_items.append(new_meal_item)
+        db.session.commit()
+
+        return jsonify(status="success"), 200
+
+    except Exception as e:
+        print(e)
+
+    return jsonify(status="fail"), 500
 
 
 @app.route("/users/<uid>/meals/", methods=['POST'])
 def add_new_meal(uid):
-    data = request.json
-    meal_content = data["meal_content"]
-    meal_time = data["meal_time"]
-    meal_type = data["meal_type"]
-    new_meal = models.Meal(meal_content=meal_content, user_id=uid, meal_type=models.MealTypeEnum(meal_type),
-                           meal_time=meal_time)
-    # TODO
-    db.session.add(new_meal)
-    db.session.commit()
+    try:
+        uid = auth_api_key(request.headers['Authorization'])
+        data = request.json
+        meal_content = data["meal_content"]
+        meal_time = data["meal_time"]
+        meal_type = data["meal_type"]
+        new_meal = models.Meal(user_id=uid, meal_type=models.MealTypeEnum(meal_type),
+                               meal_time=meal_time)
+        db.session.add(new_meal)
+        db.session.commit()
 
-    return "Meal Added Successfully", 200
+        meal = models.Meal.query.order_by(desc(models.Meal.meal_time)).filter_by(user_id=uid).first()
+
+    except KeyError:
+        abort(401)
+
+    return jsonify(meal_id=meal.id), 200
+
+
+@app.route("/nutrition/search/<search_term>", methods=['GET'])
+def search_nutrition(search_term):
+    caloric_estimator = CalorieEstimation([])
+    data = caloric_estimator.item_search(search_term)
+    print(data)
+    return data
 
 
 @app.route("/nutrition/calories", methods=['GET'])
@@ -145,14 +203,32 @@ class CalorieEstimation:
 
     def __init__(self, food_list):
         self.food_list = food_list
+
+    def get_calories_from_list(self):
         for item in self.food_list:
             self.api_params['query'] = item
             r = requests.post(url=self.url, data=self.api_params)
             data = r.json()
+            print(data)
             if int(data['total']) == 0:
                 self.calorie_list.append(None)
             else:
                 self.calorie_list.append(int(data['hits'][0]['fields']['nf_calories']))
+
+    def item_search(self, search_term):
+        output = dict()
+        self.api_params['query'] = search_term
+        r = requests.post(url=self.url, data=self.api_params)
+        data = r.json()
+
+        output["total"] = int(data['total'])
+        result_list = list()
+        for result in data["hits"]:
+            result_list.append(result["fields"])
+
+        output["results"] = result_list
+
+        return output
 
     def get_total_calories(self):
         args = [c for c in self.calorie_list if c is not None]
@@ -187,11 +263,11 @@ class FoodImageDetection:
             self.output["predictions"] = self.output.get("predictions", []) + [out]
 
     def get_results(self):
-        data = CalorieEstimation(self.output)
-        for item in data.calorie_list:
-            self.output["predictions"][data.calorie_list.index(item)]["calories"] = item
+        estimator = CalorieEstimation(self.output)
+        for item in estimator.calorie_list:
+            self.output["predictions"][estimator.calorie_list.index(item)]["calories"] = item
 
-        self.output["total_calories"] = data.get_total_calories()
+        self.output["total_calories"] = estimator.get_total_calories()
 
         return self.output
 

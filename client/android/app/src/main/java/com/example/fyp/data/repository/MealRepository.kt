@@ -4,16 +4,25 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import com.example.fyp.AppExecutors
 import com.example.fyp.data.entities.Meal
+import com.example.fyp.data.entities.MealItem
+import com.example.fyp.data.entities.MealList
 import com.example.fyp.data.local.MealDAO
 import com.example.fyp.data.remote.MealService
 import com.example.fyp.utils.NetworkBoundResource
 import com.example.fyp.utils.Resource
+import com.google.gson.JsonObject
+import okhttp3.ResponseBody
+import org.json.JSONObject
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import java.util.*
 import javax.inject.Inject
 
 class MealRepository @Inject constructor(
     private val appExecutors: AppExecutors,
     private val remoteSource: MealService,
-    private val localSource: MealDAO
+    private val localSource: MealDAO,
 ) {
 
     companion object {
@@ -21,25 +30,93 @@ class MealRepository @Inject constructor(
     }
 
     fun getAllMeals(): LiveData<Resource<List<Meal>>> {
-        return object : NetworkBoundResource<List<Meal>, List<Meal>>(appExecutors) {
-            override fun saveCallResult(item: List<Meal>) {
-                localSource.insertFromRemote(*item.map { it }.toTypedArray())
+        return object : NetworkBoundResource<List<Meal>, MealList>(appExecutors) {
+            override fun saveCallResult(item: MealList) {
+                localSource.insertFromRemote(*item.mealList.map { it }.toTypedArray())
             }
 
-            override fun shouldFetch(data: List<Meal>?): Boolean {
-                return false //ALMOST NEVER FETCH BECAUSE ONLY USED FOR SYNC TODO()
-            }
 
             override fun loadFromDb(): LiveData<List<Meal>> {
-                return localSource.getMeal()
+                return localSource.getAllMeal()
             }
 
-            override fun createCall(): LiveData<Resource<List<Meal>>> {
-                Log.e("CALL","CREATED")
+            override fun createCall(): LiveData<Resource<MealList>> {
+                Log.e("CALL", "CREATED")
                 return remoteSource.getAllMeals("me")
             }
 
+            override fun shouldFetch(data: List<Meal>?): Boolean {
+                return true
+            }
         }.asLiveData()
+    }
+
+    fun getTodayMeals(): LiveData<List<Meal>> {
+        return localSource.getTodayMeals()
+    }
+
+    fun getTodayMealWithType(mealType: Int): LiveData<Meal> {
+        return localSource.getTodayMealByType(mealType)
+    }
+
+    fun deleteAllMeals(){
+        appExecutors.diskIO().execute{
+            localSource.deleteAll()
+        }
+
+    }
+
+    fun createNewMeal(mealType: Int, mealContent: MutableList<MealItem>) {
+        val meal =
+            Meal(mealContent = mealContent, mealTime = Date(), mealType = mealType, mealID = null)
+
+        appExecutors.diskIO().execute{
+            localSource.createMeal(meal)
+        }
+
+        val call = remoteSource.insertMeals("me", meal)
+        call.enqueue(object : Callback<ResponseBody> {
+            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                if (response.isSuccessful) {
+                    val json = JSONObject(response.body()?.string().toString())
+                    meal.mealID = json.getInt("meal_id")
+                    appExecutors.diskIO().execute {
+                        localSource.updateMeal(meal)
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                Log.e("CREATE MEAL", t.message.toString())
+            }
+
+        })
+    }
+
+    fun addItemToMeal(currentMeal: Meal,addedItem: List<MealItem>){
+        currentMeal.mealContent.addAll(addedItem)
+        appExecutors.diskIO().execute {
+            localSource.updateMeal(currentMeal)
+        }
+
+        currentMeal.let {
+            val call = remoteSource.insertMealItem(userId = "me",mealID = it.mealID!!,mealItem = addedItem)
+            call.enqueue(object : Callback<ResponseBody>{
+                override fun onResponse(
+                    call: Call<ResponseBody>,
+                    response: Response<ResponseBody>,
+                ) {
+                    if (response.isSuccessful){
+                        Log.i("ADD MEAL ITEM","SUCCESS")
+                    }
+                }
+
+                override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                    Log.e("ADD MEAL ITEM",t.message.toString())
+                }
+
+            })
+        }
 
     }
 

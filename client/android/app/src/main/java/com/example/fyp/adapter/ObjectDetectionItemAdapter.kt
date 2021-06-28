@@ -10,8 +10,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.fyp.R
 import com.example.fyp.objectdetection.DetectedObjectList
 
-internal class ObjectDetectionItemAdapter(private val detectedObjectList: DetectedObjectList) :
+internal class ObjectDetectionItemAdapter() :
     RecyclerView.Adapter<ObjectDetectionItemAdapter.ItemViewHolder>() {
+
+    var detectedObjectList: DetectedObjectList? = null
 
     internal class ItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val itemName: TextView = view.findViewById(R.id.detected_object_name)
@@ -28,15 +30,21 @@ internal class ObjectDetectionItemAdapter(private val detectedObjectList: Detect
     }
 
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
-        val item = detectedObjectList.objectList[position]
-        holder.itemName.text = item.objectLabel
-        holder.itemCalories.text = (item.calories ?: 0).toString()
+        val item = detectedObjectList?.objectList?.get(position)
+        if (item != null) {
+            holder.itemName.text = item.objectLabel
+            holder.itemCalories.text = (item.calories ?: 0).toString()
+        }
         holder.btnDeleteItem.setOnClickListener {
-            val itemList = detectedObjectList.objectList.toMutableList()
-            itemList.removeAt(position)
-            detectedObjectList.objectList = itemList
+            val itemList = detectedObjectList?.objectList?.toMutableList()
+            itemList?.removeAt(position)
+            if (detectedObjectList != null) {
+                if (itemList != null) {
+                    detectedObjectList!!.objectList = itemList
+                }
+            }
             notifyDataSetChanged()
-            Log.i("DATASET",detectedObjectList.objectList.size.toString())
+            Log.i("DATASET", detectedObjectList?.objectList?.size.toString())
         }
 
         holder.btnEditItem.setOnClickListener {
@@ -46,6 +54,6 @@ internal class ObjectDetectionItemAdapter(private val detectedObjectList: Detect
     }
 
     override fun getItemCount(): Int {
-        return detectedObjectList.objectList.size
+        return detectedObjectList?.objectList?.size ?: 0
     }
 }

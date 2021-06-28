@@ -1,12 +1,10 @@
 import dataclasses
 import datetime
-import json
-from datetime import time
+import enum
+
 from flask.json import JSONEncoder
 
 from . import db
-import enum
-import dataclasses
 
 
 class GenderEnum(enum.IntEnum):
@@ -63,7 +61,7 @@ class MealTypeEnum(enum.IntEnum):
 
 
 class CustomJSONEncoder(JSONEncoder):
-    "Add support for serializing timedeltas"
+    """Add support for serializing timedelta"""
 
     def default(self, o):
         if type(o) == datetime.timedelta:
@@ -74,19 +72,19 @@ class CustomJSONEncoder(JSONEncoder):
             return super().default(o)
 
 
-@dataclasses.dataclass
-class Meal(db.Model):
-    id: int
-    meal_content: json
-    user_id: str
-    meal_type: enum
-    meal_time: datetime.datetime
+class MealItem(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    item_name = db.Column(db.String)
+    item_calorie = db.Column(db.Float)
+    meal_id = db.Column(db.Integer, db.ForeignKey('meals.id'))
 
+
+class Meal(db.Model):
     __tablename__ = 'meals'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    meal_content = db.Column(db.JSON)
     meal_type = db.Column(db.Enum(MealTypeEnum))
     meal_time = db.Column(db.DateTime)
+    meal_items = db.relationship("MealItem")
     user_id = db.Column(db.String, db.ForeignKey('users.uid'))
 
     # def __init__(self, meal_content, uid):
@@ -95,7 +93,3 @@ class Meal(db.Model):
 
     # def __repr__(self):
     #     return "ID : " + self.id + "\nContent : " + json.dumps(self.meal_content) + "\nUID : " + self.user_id
-
-    def toJSON(self):
-        return json.dumps(self, default=lambda o: o.__dict__,
-                          sort_keys=True, indent=4)

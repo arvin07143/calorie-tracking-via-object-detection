@@ -1,13 +1,16 @@
 package com.example.fyp
+
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.fyp.adapter.MealItemAdapter
+import com.example.fyp.databinding.GoalDialogLayoutBinding
 import com.example.fyp.utils.Resource
 import com.example.fyp.viewmodels.MealViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -25,17 +28,18 @@ class HomeFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         val binding = com.example.fyp.databinding.FragmentHomeBinding.inflate(layoutInflater)
         val breakfastAdapter = MealItemAdapter()
         val lunchAdapter = MealItemAdapter()
         val dinnerAdapter = MealItemAdapter()
 
-        viewModel.data.observe(viewLifecycleOwner, { resource ->
-            if (resource.status == Resource.Status.SUCCESS) {
-                resource.data?.let {
-                    Log.e("DATASIZE", it.size.toString())
+        viewModel.deleteAll()
+
+
+        viewModel.todayMeals.observe(viewLifecycleOwner, { resource ->
+                resource.let {
                     for (meal in it) {
                         Log.e("MEAL", meal.mealType.toString())
                         when (meal.mealType) {
@@ -48,9 +52,6 @@ class HomeFragment : Fragment() {
                     lunchAdapter.notifyDataSetChanged()
                     dinnerAdapter.notifyDataSetChanged()
                 }
-            } else if (resource.status == Resource.Status.ERROR) {
-                Log.e("RESOURCE", resource.message.toString())
-            }
         })
 
         binding.breakfastRecycler.adapter = breakfastAdapter
@@ -77,7 +78,7 @@ class HomeFragment : Fragment() {
                 .setTitle("Meal Type")
                 .setItems(goalTypeList) { _, which ->
                     when (which) {
-                        0 -> Log.e("LOG", "Weight Goal")
+                        0 -> showAddGoalDialog()
                         else -> Log.e("LOG", "Calorie Goal")
                     }
                 }
@@ -89,5 +90,21 @@ class HomeFragment : Fragment() {
     private fun showAddMealDialog(mealType: Int) {
         val action = HomeFragmentDirections.actionHomeToAddMealFragment(mealType)
         findNavController().navigate(action)
+    }
+
+    private fun showAddGoalDialog() {
+        val dialogView = GoalDialogLayoutBinding.inflate(layoutInflater)
+        ArrayAdapter.createFromResource(requireContext(),
+            R.array.goal_type,
+            android.R.layout.simple_spinner_item).also { arrayAdapter ->
+            arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            dialogView.goalTypeSpinner.adapter = arrayAdapter
+        }
+        MaterialAlertDialogBuilder(requireContext()).setTitle("Add Goal")
+            .setView(dialogView.root)
+            .setPositiveButton("Add Goal", { dialog, which ->
+
+            })
+            .show()
     }
 }

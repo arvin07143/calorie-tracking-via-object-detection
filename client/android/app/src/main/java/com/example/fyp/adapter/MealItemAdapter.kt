@@ -13,7 +13,7 @@ class MealItemAdapter : RecyclerView.Adapter<MealItemAdapter.ItemViewHolder>() {
     var dataset = arrayListOf<Meal>()
 
     class ItemViewHolder(itemview: View) : RecyclerView.ViewHolder(itemview){
-        val itemName:TextView = itemView.findViewById(R.id.list_item_name)
+        val itemName:TextView = itemview.findViewById(R.id.list_item_name)
         val itemCalories:TextView = itemview.findViewById(R.id.list_item_calorie)
     }
 
@@ -26,9 +26,9 @@ class MealItemAdapter : RecyclerView.Adapter<MealItemAdapter.ItemViewHolder>() {
 
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
         val item = dataset[position]
-        item.mealContent.food_list.forEachIndexed{i,element ->
-            holder.itemName.text = element
-            holder.itemCalories.text = item.mealContent.calorie_list[i].toString()
+        item.mealContent.forEachIndexed{i,element ->
+            holder.itemName.text = element.foodName
+            holder.itemCalories.text = element.calories.toString()
         }
     }
 

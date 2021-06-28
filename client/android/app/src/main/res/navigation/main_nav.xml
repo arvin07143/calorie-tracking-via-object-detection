@@ -31,5 +31,5 @@
         <argument
             android:name="mealType"
             app:argType="integer" />
-    </fragment>
+    </fragment><action android:id="@+id/action_global_home" app:destination="@id/home"/><action android:id="@+id/action_global_userProfile" app:destination="@id/userProfile"/>
 </navigation>

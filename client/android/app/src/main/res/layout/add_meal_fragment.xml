@@ -4,10 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".AddMealFragment">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:background="@color/white"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:orientation="vertical"
             app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 
             <LinearLayout
@@ -16,7 +16,7 @@
                 android:padding="8dp">
 
                 <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/filledTextField"
+                    android:id="@+id/food_search_field"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -25,50 +25,39 @@
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:inputType="text"
+                        android:maxLines="1"
+                        android:imeOptions="actionSearch"/>
 
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:layout_marginStart="8dp"
-                    android:layout_weight="0.4">
+                    android:layout_marginStart="8dp">
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btn_object_detection"
-                        style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
+                    <ImageButton
+                        android:id="@+id/btn_add_meal_overflow"
+                        style="?android:attr/actionOverflowButtonStyle"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:insetLeft="0dp"
-                        android:insetTop="0dp"
-                        android:insetRight="0dp"
-                        android:insetBottom="0dp"
-                        app:icon="@drawable/ic_baseline_qr_code_scanner_24"
-                        app:iconGravity="textStart"
-                        app:iconPadding="0dp" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btn_scan_barcode"
-                        style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_marginStart="8dp"
-                        android:layout_weight="1"
-                        android:insetLeft="0dp"
-                        android:insetTop="0dp"
-                        android:insetRight="0dp"
-                        android:insetBottom="0dp"
-                        app:icon="@drawable/ic_baseline_qr_code_scanner_24"
-                        app:iconGravity="textStart"
-                        app:iconPadding="0dp" />
+                        app:icon="@drawable/ic_baseline_more_vert_24" />
 
                 </LinearLayout>
 
 
             </LinearLayout>
 
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/tab_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/meal_view_pager"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </LinearLayout>
 </layout>

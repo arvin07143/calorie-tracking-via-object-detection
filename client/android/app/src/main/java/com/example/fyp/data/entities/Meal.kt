@@ -1,33 +1,38 @@
 package com.example.fyp.data.entities
 
-import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import java.util.*
 
+@JsonClass(generateAdapter = true)
+data class MealList(
+    @Json(name = "meals")
+    val mealList: List<Meal>,
+)
+
 @Entity(tableName = "meals")
 @JsonClass(generateAdapter = true)
 data class Meal(
-    @PrimaryKey(autoGenerate = true)
-    val id : Long,
     @Json(name = "meal_content")
-    @Embedded
-    val mealContent: MealContent,
+    var mealContent: MutableList<MealItem>,
+    @PrimaryKey
     @Json(name = "meal_time")
     val mealTime: Date,
     @Json(name = "meal_type")
-    val mealType: Int
+    val mealType: Int,
+    var mealID: Int?,
 )
 
 @JsonClass(generateAdapter = true)
-data class MealContent(
+data class MealItem(
+    @Json(name = "item_name")
+    val foodName: String,
     @Json(name = "calories")
-    val calorie_list: List<Int>,
-    @Json(name = "food")
-    val food_list: List<String>
+    val calories: Float,
 )
+
 
 enum class MealType(val type: Int) {
     BREAKFAST(0),
