@@ -1,4 +1,5 @@
 ai/
 backend/__pycache__/*
+backend/app/config.py
 backend/app/__pycache__/*
 backed/app/final-year-project-857e3-firebase-adminsdk-bg3u9-be02fa831b.json
