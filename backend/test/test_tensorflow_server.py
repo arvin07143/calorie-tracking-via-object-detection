@@ -4,8 +4,6 @@ import json
 import numpy as np
 import requests
 from PIL import Image
-from keras.preprocessing import image
-import tensorflow as tf
 
 ap = argparse.ArgumentParser()
 ap.add_argument("-i", "--image", required=True)

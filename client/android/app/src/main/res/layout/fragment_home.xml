@@ -18,31 +18,29 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:cardBackgroundColor="@color/dark_blue"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
-
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical">
+                        android:orientation="horizontal"
+                        android:padding="16dp">
 
                         <TextView
+                            android:id="@+id/home_profile_name"
+                            style="@style/TextAppearance.MaterialComponents.Body2"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Hello Arvin" />
+                            android:layout_weight="1"
+                            android:textAlignment="textStart" />
 
                         <TextView
+                            android:id="@+id/home_date"
+                            style="@style/TextAppearance.MaterialComponents.Body2"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Today, Oct 29" />
+                            android:layout_weight="1"
+                            android:textAlignment="textEnd" />
                     </LinearLayout>
 
-                </com.google.android.material.card.MaterialCardView>
 
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
@@ -50,34 +48,74 @@
                     android:layout_marginTop="8dp"
                     app:cardElevation="4dp">
 
-                    <RelativeLayout
+                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+                        android:layout_height="match_parent"
+                        android:orientation="vertical">
 
-                        <me.turkergoksu.lib.PercentageView
-                            android:layout_width="250dp"
-                            android:layout_height="250dp"
-                            android:layout_centerInParent="true"
-                            app:percentage="60"
-                            app:textColor="@color/white" />
-
-                        <LinearLayout
+                        <TextView
+                            android:layout_marginStart="8dp"
+                            style="@style/TextAppearance.MaterialComponents.Headline6"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_centerInParent="true"
-                            android:orientation="vertical">
+                            android:text="Today Calories" />
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <me.turkergoksu.lib.PercentageView
+                                android:id="@+id/calorie_percentage_view"
+                                android:layout_width="250dp"
+                                android:layout_height="250dp"
+                                android:layout_centerInParent="true"
+                                app:percentage="60"
+                                app:textColor="@color/white" />
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerInParent="true"
+                                android:orientation="vertical">
+
+                                <ImageView
+                                    android:layout_width="50dp"
+                                    android:layout_height="50dp"
+                                    android:layout_gravity="center"
+                                    android:layout_marginBottom="8dp"
+                                    android:src="@drawable/ic_baseline_local_dining_24" />
+
+                                <TextView
+                                    android:id="@+id/txt_current_calories"
+                                    style="@style/TextAppearance.MaterialComponents.Body1"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center"
+                                    android:text="Current : 1500 kcal" />
+                            </LinearLayout>
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="TEST" />
+                                android:layout_alignStart="@+id/calorie_percentage_view"
+                                android:layout_alignParentBottom="true"
+                                android:layout_marginStart="32dp"
+                                android:layout_marginEnd="0dp"
+                                android:layout_marginBottom="30dp"
+                                android:text="0" />
 
                             <TextView
+                                android:id="@+id/calorie_percentage_end"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="TEST" />
-                        </LinearLayout>
-                    </RelativeLayout>
+                                android:layout_alignEnd="@+id/calorie_percentage_view"
+                                android:layout_alignParentBottom="true"
+                                android:layout_marginEnd="32dp"
+                                android:layout_marginBottom="30dp"
+                                android:text="2000" />
+
+                        </RelativeLayout>
+                    </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
                 <com.google.android.material.card.MaterialCardView

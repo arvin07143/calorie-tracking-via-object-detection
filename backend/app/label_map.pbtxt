@@ -24,7 +24,7 @@ item {
 }
 item {
     id: 7
-    name: 'nasi_lemak'
+    name: 'nasi lemak'
 }
 item {
     id: 8
@@ -42,5 +42,5 @@ item {
 
 item {
     id: 11
-    name: 'roti_canai'
+    name: 'roti canai'
 }	

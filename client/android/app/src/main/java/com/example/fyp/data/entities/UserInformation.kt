@@ -11,5 +11,13 @@ data class UserInformation(
     val height: Int,
     val weight: Float,
     @Json(name = "date_of_birth")
-    val dob: Date
+    val dob: Date,
+)
+
+@JsonClass(generateAdapter = true)
+data class UserGoal(
+    val goalId: Int,
+    val goalType: Int,
+    val goalValue: Float,
+    val goalIncrement: Float?,
 )

@@ -1,15 +1,18 @@
 package com.example.fyp.data.repository
 
+import android.content.SharedPreferences
 import android.util.Log
 import androidx.lifecycle.LiveData
 import com.example.fyp.AppExecutors
 import com.example.fyp.data.entities.Meal
 import com.example.fyp.data.entities.MealItem
 import com.example.fyp.data.entities.MealList
+import com.example.fyp.data.entities.UserInformation
 import com.example.fyp.data.local.MealDAO
 import com.example.fyp.data.remote.MealService
 import com.example.fyp.utils.NetworkBoundResource
 import com.example.fyp.utils.Resource
+import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.JsonObject
 import okhttp3.ResponseBody
 import org.json.JSONObject
@@ -23,6 +26,7 @@ class MealRepository @Inject constructor(
     private val appExecutors: AppExecutors,
     private val remoteSource: MealService,
     private val localSource: MealDAO,
+    private val sharedPreferences: SharedPreferences
 ) {
 
     companion object {
@@ -120,7 +124,11 @@ class MealRepository @Inject constructor(
 
     }
 
-    fun refreshMeals() {
-        TODO()
+    fun getUserProfileInfo() : UserInformation{
+        val height = sharedPreferences.getInt("height", 0)
+        val weight = sharedPreferences.getFloat("weight", 0F)
+        val dob = sharedPreferences.getLong("dob",0)
+
+        return UserInformation(weight = weight,height = height,dob = Date(dob),gender = 0,uid="")
     }
 }

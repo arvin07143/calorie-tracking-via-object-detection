@@ -1,12 +1,13 @@
 import base64
 import datetime
+import json
 from io import BytesIO
 
 import numpy as np
 import requests
 from PIL import Image
 from firebase_admin import auth
-from flask import jsonify
+from flask import jsonify, flash
 from flask_sqlalchemy import *
 from object_detection.utils.label_map_util import create_category_index_from_labelmap
 from sqlalchemy import desc
@@ -22,19 +23,18 @@ def hello_world():
     return "Hello World"
 
 
-@app.route("/detection/predict/", methods=['GET'])
-# TODO CHANGE TO GET ONLY
+@app.route("/detection/predict/", methods=['GET', 'POST'])
 def inference():
-    try:
-        data = request.json
-        image_b64 = data['b64']
-    except (TypeError, BadRequest, KeyError):
-        image_b64 = request.args["b64"]
+    if 'file' not in request.files:
+        abort(500)
 
-    received_image = Image.open(BytesIO(base64.b64decode(image_b64)))
+    uploaded_file = request.files['file']
+    received_image = Image.open(uploaded_file)
 
     detector = FoodImageDetection(received_image)
     results = detector.get_results()
+
+    print(results)
 
     return jsonify(results)
 
@@ -138,19 +138,21 @@ def add_new_meal(uid):
         db.session.add(new_meal)
         db.session.commit()
 
-        meal = models.Meal.query.order_by(desc(models.Meal.meal_time)).filter_by(user_id=uid).first()
-
     except KeyError:
         abort(401)
 
+    meal = models.Meal.query.order_by(desc(models.Meal.meal_time)).filter_by(user_id=uid).first()
     return jsonify(meal_id=meal.id), 200
+
+@app.route("/users/<uid>/goals/",methods=["POST,PUT"])
+def add_new_goal(uid):
+    pass
 
 
 @app.route("/nutrition/search/<search_term>", methods=['GET'])
 def search_nutrition(search_term):
-    caloric_estimator = CalorieEstimation([])
+    caloric_estimator = CalorieEstimation()
     data = caloric_estimator.item_search(search_term)
-    print(data)
     return data
 
 
@@ -162,8 +164,10 @@ def get_caloric_content():
     except (TypeError, BadRequest, KeyError) as ex:
         food_name = request.args['food-name']
 
-    estimator = CalorieEstimation(food_name)
-    return jsonify(calorie_list=estimator.calorie_list, total_calories=estimator.get_total_calories())
+    estimator = CalorieEstimation()
+    calorie_list = estimator.get_calories_from_list(food_list=[food_name])
+    total = estimator.get_total_calories(calorie_list)
+    return jsonify(calorie_list=calorie_list, total_calories=total)
 
 
 def auth_api_key(id_token):
@@ -199,21 +203,20 @@ class CalorieEstimation:
         "fields": ['item_name', 'nf_calories']
     }
 
-    calorie_list = []
-
-    def __init__(self, food_list):
-        self.food_list = food_list
-
-    def get_calories_from_list(self):
-        for item in self.food_list:
+    def get_calories_from_list(self, food_list):
+        name_list = []
+        calorie_list = []
+        for item in food_list:
             self.api_params['query'] = item
             r = requests.post(url=self.url, data=self.api_params)
             data = r.json()
-            print(data)
             if int(data['total']) == 0:
-                self.calorie_list.append(None)
+                calorie_list.append(0)
             else:
-                self.calorie_list.append(int(data['hits'][0]['fields']['nf_calories']))
+                name_list.append((data['hits'][0]['fields']['item_name']))
+                calorie_list.append(int(data['hits'][0]['fields']['nf_calories']))
+
+        return name_list, calorie_list
 
     def item_search(self, search_term):
         output = dict()
@@ -230,8 +233,9 @@ class CalorieEstimation:
 
         return output
 
-    def get_total_calories(self):
-        args = [c for c in self.calorie_list if c is not None]
+    @staticmethod
+    def get_total_calories(calorie_list):
+        args = [c for c in calorie_list if c is not None]
         return sum(args) if args else 0
 
 
@@ -239,14 +243,13 @@ class FoodImageDetection:
     OBJECT_DETECTION_URL = app.config['TF_SERVER_URL']
     PATH_TO_LABELS = app.config['PATH_LABELS']
 
-    output = dict()
-
     def __init__(self, image):
         self.image_array = np.array(image.convert('RGB'))
         payload = {
             "instances": [self.image_array.tolist()]
         }
 
+        self.output = dict()
         r = requests.post(self.OBJECT_DETECTION_URL, json=payload)
         pred = (r.json())["predictions"][0]
         detected_items_index = [i for i in range(len(pred['detection_scores'])) if pred['detection_scores'][i] > 0.5]
@@ -254,8 +257,8 @@ class FoodImageDetection:
         category_index = create_category_index_from_labelmap(self.PATH_TO_LABELS,
                                                              use_display_name=True)
 
+        out = dict()
         for i in detected_items_index:
-            out = dict()
             out['detection_box'] = out.get('detection_box', []) + pred['detection_boxes'][i]
             out['detection_class'] = out.get('detection_class', "") + category_index[pred['detection_classes'][i]][
                 'name']
@@ -263,11 +266,16 @@ class FoodImageDetection:
             self.output["predictions"] = self.output.get("predictions", []) + [out]
 
     def get_results(self):
-        estimator = CalorieEstimation(self.output)
-        for item in estimator.calorie_list:
-            self.output["predictions"][estimator.calorie_list.index(item)]["calories"] = item
 
-        self.output["total_calories"] = estimator.get_total_calories()
+        food_list = [x["detection_class"] for x in self.output.get("predictions", [])]
+
+        name, calorie = CalorieEstimation().get_calories_from_list(food_list)
+
+        for idx, val in enumerate(calorie):
+            self.output["predictions"][idx]['detection_class'] = name[idx]
+            self.output["predictions"][idx]["calories"] = val
+
+        self.output["total_calories"] = CalorieEstimation().get_total_calories(calorie)
 
         return self.output
 

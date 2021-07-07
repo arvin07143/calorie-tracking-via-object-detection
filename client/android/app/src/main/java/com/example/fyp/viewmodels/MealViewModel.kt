@@ -22,5 +22,9 @@ class MealViewModel @Inject constructor(
         }
     }
 
+    fun addGoal(){
+
+    }
+
 
 }

@@ -1,9 +1,11 @@
-from . import config
+import firebase_admin
+import requests_cache
+from firebase_admin import credentials
 from flask import Flask
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
-from firebase_admin import credentials
-import firebase_admin
+
+from . import config
 
 app = Flask(__name__)
 app.config.from_object(config.DevelopmentConfig())

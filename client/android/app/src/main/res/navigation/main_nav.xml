@@ -13,7 +13,7 @@
     <fragment
         android:id="@+id/home"
         android:name="com.example.fyp.HomeFragment"
-        android:label="fragment_home"
+        android:label="Home"
         tools:layout="@layout/fragment_home" >
         <action
             android:id="@+id/action_home_to_userProfile"
@@ -25,11 +25,14 @@
     </fragment>
     <fragment
         android:id="@+id/addMealFragment"
+        android:label="{title}"
         android:name="com.example.fyp.AddMealFragmentDialog"
-        android:label="{mealType}"
         tools:layout="@layout/add_meal_fragment" >
         <argument
             android:name="mealType"
             app:argType="integer" />
+        <argument
+            android:name="title"
+            app:argType="string" />
     </fragment><action android:id="@+id/action_global_home" app:destination="@id/home"/><action android:id="@+id/action_global_userProfile" app:destination="@id/userProfile"/>
 </navigation>

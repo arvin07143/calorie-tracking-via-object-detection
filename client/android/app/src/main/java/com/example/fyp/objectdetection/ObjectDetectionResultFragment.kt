@@ -1,22 +1,29 @@
 package com.example.fyp.objectdetection
 
+import android.app.Activity
+import android.content.Intent
+import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
-import android.util.Base64
+import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.loader.content.CursorLoader
 import androidx.navigation.fragment.navArgs
 import com.example.fyp.adapter.ObjectDetectionItemAdapter
 import com.example.fyp.data.remote.WebAPI
 import com.example.fyp.databinding.FragmentObjectDetectionResultBinding
 import dagger.hilt.android.AndroidEntryPoint
+import okhttp3.MediaType
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.Response
-import java.io.IOException
 import javax.inject.Inject
+
 
 @AndroidEntryPoint
 class ObjectDetectionResultFragment : Fragment() {
@@ -44,24 +51,42 @@ class ObjectDetectionResultFragment : Fragment() {
         val adapter = ObjectDetectionItemAdapter()
         binding.detectedObjectRecycler.adapter = adapter
 
-        webAPI.predictImage(imageUriToBase64(imageUri))
-            .enqueue(object : retrofit2.Callback<DetectedObjectList> {
-                override fun onResponse(
-                    call: Call<DetectedObjectList>,
-                    response: Response<DetectedObjectList>,
-                ) {
-                    if (response.isSuccessful && response.body() != null) {
-                        adapter.detectedObjectList = response.body()
-                        adapter.notifyDataSetChanged()
+        val file = requireContext().contentResolver.openInputStream(imageUri)
+
+        file?.let {
+            val part = MultipartBody.Part.createFormData("file",
+                "image",
+                RequestBody.create(MediaType.parse("image/*"), it.readBytes()));
+
+            webAPI.predictImage(part)
+                .enqueue(object : retrofit2.Callback<DetectedObjectList> {
+                    override fun onResponse(
+                        call: Call<DetectedObjectList>,
+                        response: Response<DetectedObjectList>,
+                    ) {
+                        if (response.isSuccessful && response.body() != null) {
+                            adapter.detectedObjectList = response.body()
+                            Log.i("DETECTED", response.body()!!.objectList.size.toString())
+                            adapter.notifyDataSetChanged()
+                        }
+
                     }
 
-                }
+                    override fun onFailure(call: Call<DetectedObjectList>, t: Throwable) {
+                        Log.e("RESULT ERROR", t.message.toString())
+                    }
+                })
+        }
 
-                override fun onFailure(call: Call<DetectedObjectList>, t: Throwable) {
-                    Log.e("RESULT ERROR", t.message.toString())
-                }
-
-            })
+        binding.objectDetectionConfirm.setOnClickListener {
+            val data = adapter.detectedObjectList
+            val resultIntent = Intent()
+            if (data != null) {
+                resultIntent.putExtra("detectedObjects",data)
+            }
+            requireActivity().setResult(Activity.RESULT_OK,resultIntent)
+            requireActivity().finish()
+        }
 
         return binding.root
     }
@@ -79,14 +104,4 @@ class ObjectDetectionResultFragment : Fragment() {
             ObjectDetectionResultFragment()
     }
 
-    private fun imageUriToBase64(uri: Uri): String {
-        try {
-            val bytes = requireActivity().contentResolver.openInputStream(uri)?.readBytes()
-
-            return Base64.encodeToString(bytes, Base64.DEFAULT)
-        } catch (e: IOException) {
-            Log.e("file", e.message.toString())
-        }
-        return ""
-    }
 }

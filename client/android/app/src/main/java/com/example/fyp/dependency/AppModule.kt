@@ -1,6 +1,7 @@
 package com.example.fyp.dependency
 
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.room.Room
 import com.example.fyp.AppExecutors
 import com.example.fyp.data.local.MealDAO
@@ -88,11 +89,18 @@ object AppModule {
 
     @Singleton
     @Provides
+    fun provideSharedPreference(@ApplicationContext context: Context):SharedPreferences{
+        return context.getSharedPreferences("user_data",Context.MODE_PRIVATE)
+    }
+
+    @Singleton
+    @Provides
     fun provideRepository(
         appExecutors: AppExecutors,
         remoteDataSource: MealService,
         localDataSource: MealDAO,
+        sharedPreferences: SharedPreferences
     ): MealRepository {
-        return MealRepository(appExecutors, remoteDataSource, localDataSource)
+        return MealRepository(appExecutors, remoteDataSource, localDataSource,sharedPreferences)
     }
 }

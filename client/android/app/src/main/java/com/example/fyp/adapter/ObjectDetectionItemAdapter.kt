@@ -8,16 +8,20 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.fyp.R
+import com.example.fyp.databinding.EditFoodDetailsDialogBinding
+import com.example.fyp.objectdetection.DetectedObject
 import com.example.fyp.objectdetection.DetectedObjectList
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
-internal class ObjectDetectionItemAdapter() :
+class ObjectDetectionItemAdapter() :
     RecyclerView.Adapter<ObjectDetectionItemAdapter.ItemViewHolder>() {
 
     var detectedObjectList: DetectedObjectList? = null
+    lateinit var onClickListener: View.OnClickListener
 
-    internal class ItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val itemName: TextView = view.findViewById(R.id.detected_object_name)
-        val itemCalories: TextView = view.findViewById(R.id.detected_object_calories)
+    class ItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val itemName: TextView = view.findViewById(R.id.list_item_name)
+        val itemCalories: TextView = view.findViewById(R.id.list_item_calorie)
         val btnEditItem: ImageButton = view.findViewById(R.id.btn_edit_object)
         val btnDeleteItem: ImageButton = view.findViewById(R.id.btn_delete_objet)
     }
@@ -48,7 +52,33 @@ internal class ObjectDetectionItemAdapter() :
         }
 
         holder.btnEditItem.setOnClickListener {
+            val binding =
+                EditFoodDetailsDialogBinding.inflate(LayoutInflater.from(holder.itemName.context))
+            binding.foodNameField.editText?.setText(holder.itemName.text)
+            binding.calorieValueField.editText?.setText(holder.itemCalories.text)
+            val resources = holder.itemName.context.resources
 
+            MaterialAlertDialogBuilder(holder.itemName.context)
+                .setTitle("Edit Food")
+                .setView(binding.root)
+                .setNegativeButton(resources.getString(R.string.cancel)) { dialog, which ->
+                    dialog.dismiss()
+                }
+                .setPositiveButton(resources.getString(R.string.confirm)) { dialog, which ->
+                    val itemList = detectedObjectList?.objectList?.toMutableList()
+
+                    itemList?.get(position)?.let {
+                        it.objectLabel = binding.foodNameField.editText?.text.toString()
+                        it.calories = binding.calorieValueField.editText?.text.toString().toInt()
+                    }
+                    if (detectedObjectList != null) {
+                        if (itemList != null) {
+                            detectedObjectList!!.objectList = itemList
+                        }
+                    }
+                    notifyDataSetChanged()
+                }
+                .show()
         }
 
     }

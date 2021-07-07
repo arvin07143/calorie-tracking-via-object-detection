@@ -56,7 +56,7 @@ class LoginFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = FragmentLoginBinding.inflate(layoutInflater)
         // Inflate the layout for this fragment
@@ -80,7 +80,7 @@ class LoginFragment : Fragment() {
                         ).show()
                     }
                 }
-            } else{
+            } else {
                 binding.emailField.error = "Invalid Email"
             }
         }
@@ -143,7 +143,7 @@ class LoginFragment : Fragment() {
             call.enqueue(object : Callback<UserInformation> {
                 override fun onResponse(
                     call: Call<UserInformation>,
-                    response: retrofit2.Response<UserInformation>
+                    response: retrofit2.Response<UserInformation>,
                 ) {
                     if (response.isSuccessful) {
                         val userInformation = response.body()
@@ -159,7 +159,7 @@ class LoginFragment : Fragment() {
                                 apply()
                             }
                             findNavController().navigate(R.id.action_loginFragment_to_mainActivity)
-                        } else{
+                        } else {
                             findNavController().navigate(R.id.action_loginFragment_to_registerInformationFragment)
                         }
                     }

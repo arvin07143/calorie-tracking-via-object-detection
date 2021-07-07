@@ -16,6 +16,7 @@ import com.example.fyp.data.entities.MealItem
 import com.example.fyp.data.remote.MealService
 import com.example.fyp.databinding.FragmentAddMealSearchBinding
 import com.example.fyp.viewmodels.AddMealViewModel
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.gson.JsonObject
 import com.squareup.moshi.Json
 import dagger.hilt.android.AndroidEntryPoint
@@ -25,9 +26,11 @@ import retrofit2.Response
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class AddMealSearchFragment : Fragment(),OnItemClickListener{
+class AddMealSearchFragment : Fragment(),OnItemClickListener, AddMealFragmentDialog.SearchListener {
 
     @Inject lateinit var mealService:MealService
+    lateinit var binding: FragmentAddMealSearchBinding
+    lateinit var adapter: FoodSearchItemAdapter
 
     private val addMealViewModel: AddMealViewModel by activityViewModels()
 
@@ -35,29 +38,11 @@ class AddMealSearchFragment : Fragment(),OnItemClickListener{
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        val binding = FragmentAddMealSearchBinding.inflate(layoutInflater)
+        binding = FragmentAddMealSearchBinding.inflate(layoutInflater)
 
-        val adapter = FoodSearchItemAdapter().also {
+        adapter = FoodSearchItemAdapter().also {
             it.onItemClickListener = this
         }
-        addMealViewModel.searchStringLiveData.observe(viewLifecycleOwner, {
-            val call = mealService.search(it)
-            call.enqueue(object : Callback<FoodSearchResultList> {
-                override fun onResponse(
-                    call: Call<FoodSearchResultList>,
-                    response: Response<FoodSearchResultList>,
-                ) {
-                    if (response.isSuccessful) {
-                        adapter.dataset = response.body()
-                        adapter.notifyDataSetChanged()
-                    }
-                }
-                override fun onFailure(call: Call<FoodSearchResultList>, t: Throwable) {
-                    Log.e("SEARCH",t.message.toString())
-                }
-            })
-        })
-
 
         binding.searchResultRecycler.adapter = adapter
 
@@ -65,7 +50,34 @@ class AddMealSearchFragment : Fragment(),OnItemClickListener{
     }
 
     override fun addNewItem(item: MealItem) {
-        addMealViewModel.addMealFromSearch(item)
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Add Meal")
+            .setPositiveButton("Add"){ _, _ ->
+                addMealViewModel.addMealFromSearch(item)
+            }
+            .setNegativeButton("Cancel"){dialog,_ ->
+                dialog.dismiss()
+            }
+            .show()
+    }
+
+    override fun search(searchTerm: String) {
+        val call = mealService.search(searchTerm)
+        call.enqueue(object : Callback<FoodSearchResultList> {
+            override fun onResponse(
+                call: Call<FoodSearchResultList>,
+                response: Response<FoodSearchResultList>,
+            ) {
+                if (response.isSuccessful) {
+                    adapter.dataset = response.body()
+                    adapter.notifyDataSetChanged()
+                }
+            }
+            override fun onFailure(call: Call<FoodSearchResultList>, t: Throwable) {
+                Log.e("SEARCH",t.message.toString())
+            }
+        })
     }
 
 }
+
