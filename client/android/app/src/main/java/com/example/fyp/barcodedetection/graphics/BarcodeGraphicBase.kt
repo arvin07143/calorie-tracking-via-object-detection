@@ -5,14 +5,17 @@ import androidx.core.content.ContextCompat
 import com.example.fyp.R
 import com.example.fyp.camera.GraphicOverlay
 
-internal abstract class BarcodeGraphicBase(overlay: GraphicOverlay) : GraphicOverlay.Graphic(overlay) {
+internal abstract class BarcodeGraphicBase(overlay: GraphicOverlay) :
+    GraphicOverlay.Graphic(overlay) {
 
     private val boxPaint: Paint = Paint().apply {
         color = ContextCompat.getColor(context,
             R.color.barcode_reticle_stroke
         )
         style = Paint.Style.STROKE
-        strokeWidth = context.resources.getDimensionPixelOffset(R.dimen.barcode_reticle_stroke_width).toFloat()
+        strokeWidth =
+            context.resources.getDimensionPixelOffset(R.dimen.barcode_reticle_stroke_width)
+                .toFloat()
     }
 
     private val scrimPaint: Paint = Paint().apply {

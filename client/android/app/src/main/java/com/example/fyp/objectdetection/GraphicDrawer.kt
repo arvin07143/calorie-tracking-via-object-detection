@@ -12,7 +12,7 @@ import kotlin.math.min
 
 class GraphicDrawer constructor(
     overlay: GraphicOverlay,
-    private val detectedObject: DetectedObject
+    private val detectedObject: DetectedObject,
 ) : GraphicOverlay.Graphic(overlay) {
 
     private val numColors = COLORS.size
@@ -88,7 +88,7 @@ class GraphicDrawer constructor(
         )
         yLabelOffset += lineHeight
 
-        Log.e("DRAWN","DRAWN")
+        Log.e("DRAWN", "DRAWN")
     }
 
     companion object {

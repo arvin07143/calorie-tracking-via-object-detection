@@ -5,16 +5,16 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="24dp"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="24dp">
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/food_name_field"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Food Name"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="8dp"
+            android:hint="Food Name">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"

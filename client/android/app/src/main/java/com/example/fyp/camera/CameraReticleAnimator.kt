@@ -9,9 +9,11 @@ internal class CameraReticleAnimator(graphicOverlay: GraphicOverlay) {
     /** Returns the scale value of ripple alpha ranges in [0, 1].  */
     var rippleAlphaScale = 0f
         private set
+
     /** Returns the scale value of ripple size ranges in [0, 1].  */
     var rippleSizeScale = 0f
         private set
+
     /** Returns the scale value of ripple stroke width ranges in [0, 1].  */
     var rippleStrokeWidthScale = 1f
         private set
@@ -19,13 +21,15 @@ internal class CameraReticleAnimator(graphicOverlay: GraphicOverlay) {
     private val animatorSet: AnimatorSet
 
     init {
-        val rippleFadeInAnimator = ValueAnimator.ofFloat(0f, 1f).setDuration(DURATION_RIPPLE_FADE_IN_MS)
+        val rippleFadeInAnimator =
+            ValueAnimator.ofFloat(0f, 1f).setDuration(DURATION_RIPPLE_FADE_IN_MS)
         rippleFadeInAnimator.addUpdateListener { animation ->
             rippleAlphaScale = animation.animatedValue as Float
             graphicOverlay.postInvalidate()
         }
 
-        val rippleFadeOutAnimator = ValueAnimator.ofFloat(1f, 0f).setDuration(DURATION_RIPPLE_FADE_OUT_MS)
+        val rippleFadeOutAnimator =
+            ValueAnimator.ofFloat(1f, 0f).setDuration(DURATION_RIPPLE_FADE_OUT_MS)
         rippleFadeOutAnimator.startDelay =
             START_DELAY_RIPPLE_FADE_OUT_MS
         rippleFadeOutAnimator.addUpdateListener { animation ->
@@ -33,7 +37,8 @@ internal class CameraReticleAnimator(graphicOverlay: GraphicOverlay) {
             graphicOverlay.postInvalidate()
         }
 
-        val rippleExpandAnimator = ValueAnimator.ofFloat(0f, 1f).setDuration(DURATION_RIPPLE_EXPAND_MS)
+        val rippleExpandAnimator =
+            ValueAnimator.ofFloat(0f, 1f).setDuration(DURATION_RIPPLE_EXPAND_MS)
         rippleExpandAnimator.startDelay =
             START_DELAY_RIPPLE_EXPAND_MS
         rippleExpandAnimator.interpolator = FastOutSlowInInterpolator()
@@ -52,7 +57,8 @@ internal class CameraReticleAnimator(graphicOverlay: GraphicOverlay) {
             graphicOverlay.postInvalidate()
         }
 
-        val fakeAnimatorForRestartDelay = ValueAnimator.ofInt(0, 0).setDuration(DURATION_RESTART_DORMANCY_MS)
+        val fakeAnimatorForRestartDelay =
+            ValueAnimator.ofInt(0, 0).setDuration(DURATION_RESTART_DORMANCY_MS)
         fakeAnimatorForRestartDelay.startDelay =
             START_DELAY_RESTART_DORMANCY_MS
         animatorSet = AnimatorSet()

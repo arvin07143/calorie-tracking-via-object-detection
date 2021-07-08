@@ -36,12 +36,13 @@ class BarcodeScanningFragment : Fragment(), BarcodeListener {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = FragmentBarcodeScanningBinding.inflate(inflater, container, false)
-        barcodeAnalyzer = BarcodeAnalyzer(graphicOverlay = binding.barcodeScanningView.overlay).apply {
-            this.barcodeResultListener = this@BarcodeScanningFragment
-        }
+        barcodeAnalyzer =
+            BarcodeAnalyzer(graphicOverlay = binding.barcodeScanningView.overlay).apply {
+                this.barcodeResultListener = this@BarcodeScanningFragment
+            }
 
         binding.barcodeScanningView.cameraTopMenu.closeButton.setOnClickListener {
             activity?.finish()
@@ -50,7 +51,7 @@ class BarcodeScanningFragment : Fragment(), BarcodeListener {
         binding.barcodeScanningView.cameraTopMenu.flashButton.setOnClickListener {
             flashMode = !flashMode
             if (barcodeScanner.camera.cameraInfo.hasFlashUnit()) {
-                barcodeScanner.camera.cameraControl.enableTorch(flashMode); // or false
+                barcodeScanner.camera.cameraControl.enableTorch(flashMode) // or false
             } else {
                 Log.e("CAMERA", "NO FLASH")
                 Toast.makeText(requireContext(), "No flash on this device", Toast.LENGTH_SHORT)
@@ -76,14 +77,15 @@ class BarcodeScanningFragment : Fragment(), BarcodeListener {
 
                 .build()
 
-            barcodeScanner.addFutureListener(Runnable {
-                barcodeScanner.setupCamera(requireActivity().windowManager, binding.barcodeScanningView.viewfinder)
+            barcodeScanner.addFutureListener({
+                barcodeScanner.setupCamera(requireActivity().windowManager,
+                    binding.barcodeScanningView.viewfinder)
             }, ContextCompat.getMainExecutor(requireContext()))
         } else {
             requestPermissions(REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
         }
 
-        viewModel.shouldScan.observe(viewLifecycleOwner, Observer {
+        viewModel.shouldScan.observe(viewLifecycleOwner, {
             if (it == true) {
                 barcodeScanner.startScanning()
             }
@@ -94,7 +96,7 @@ class BarcodeScanningFragment : Fragment(), BarcodeListener {
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
-        grantResults: IntArray
+        grantResults: IntArray,
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         barcodeScanner = MyBarcodeScanner.Builder(requireContext())
@@ -102,8 +104,9 @@ class BarcodeScanningFragment : Fragment(), BarcodeListener {
             .setImageAnalyzer(barcodeAnalyzer)
             .build()
 
-        barcodeScanner.addFutureListener(Runnable {
-            barcodeScanner.setupCamera(requireActivity().windowManager, binding.barcodeScanningView.viewfinder)
+        barcodeScanner.addFutureListener({
+            barcodeScanner.setupCamera(requireActivity().windowManager,
+                binding.barcodeScanningView.viewfinder)
         }, ContextCompat.getMainExecutor(requireContext()))
     }
 

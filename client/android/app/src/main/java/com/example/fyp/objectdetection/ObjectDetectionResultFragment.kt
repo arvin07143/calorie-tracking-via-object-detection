@@ -2,16 +2,13 @@ package com.example.fyp.objectdetection
 
 import android.app.Activity
 import android.content.Intent
-import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.loader.content.CursorLoader
 import androidx.navigation.fragment.navArgs
 import com.example.fyp.adapter.ObjectDetectionItemAdapter
 import com.example.fyp.data.remote.WebAPI
@@ -56,7 +53,7 @@ class ObjectDetectionResultFragment : Fragment() {
         file?.let {
             val part = MultipartBody.Part.createFormData("file",
                 "image",
-                RequestBody.create(MediaType.parse("image/*"), it.readBytes()));
+                RequestBody.create(MediaType.parse("image/*"), it.readBytes()))
 
             webAPI.predictImage(part)
                 .enqueue(object : retrofit2.Callback<DetectedObjectList> {
@@ -82,9 +79,9 @@ class ObjectDetectionResultFragment : Fragment() {
             val data = adapter.detectedObjectList
             val resultIntent = Intent()
             if (data != null) {
-                resultIntent.putExtra("detectedObjects",data)
+                resultIntent.putExtra("detectedObjects", data)
             }
-            requireActivity().setResult(Activity.RESULT_OK,resultIntent)
+            requireActivity().setResult(Activity.RESULT_OK, resultIntent)
             requireActivity().finish()
         }
 

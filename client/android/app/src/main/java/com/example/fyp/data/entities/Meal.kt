@@ -34,9 +34,3 @@ data class MealItem(
 )
 
 
-enum class MealType(val type: Int) {
-    BREAKFAST(0),
-    LUNCH(1),
-    DINNER(2)
-}
-

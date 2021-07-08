@@ -3,7 +3,6 @@ package com.example.fyp.data.local
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.example.fyp.data.entities.Meal
-import java.util.*
 
 @Dao
 interface MealDAO {
@@ -27,7 +26,7 @@ interface MealDAO {
 
     //Meal TIme must be converted from milliseconds to seconds before using date() as per SQLite Documentation
     @Query("SELECT * FROM meals WHERE date(mealTime/1000,'unixepoch') = date('now') AND mealType = :mealType LIMIT 1")
-    fun getTodayMealByType(mealType:Int) : LiveData<Meal>
+    fun getTodayMealByType(mealType: Int): LiveData<Meal>
 
     @Query("DELETE FROM meals")
     fun deleteAll()

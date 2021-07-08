@@ -16,7 +16,7 @@ import com.google.mlkit.vision.common.InputImage
 import java.util.concurrent.atomic.AtomicBoolean
 
 class BarcodeAnalyzer(
-    private val graphicOverlay: GraphicOverlay
+    private val graphicOverlay: GraphicOverlay,
 ) : ImageAnalysis.Analyzer {
     private val cameraReticleAnimator: CameraReticleAnimator = CameraReticleAnimator(graphicOverlay)
     private val barcodeScanner = BarcodeScanning.getClient()
@@ -78,7 +78,7 @@ class BarcodeAnalyzer(
 
     private fun createLoadingAnimator(
         graphicOverlay: GraphicOverlay,
-        barcode: Barcode
+        barcode: Barcode,
     ): ValueAnimator {
         val endProgress = 1.1f
         return ValueAnimator.ofFloat(0f, endProgress).apply {

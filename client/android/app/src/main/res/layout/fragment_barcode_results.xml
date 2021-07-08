@@ -2,21 +2,22 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingTop="@dimen/barcode_bottom_sheet_padding_vertical"
-    android:paddingBottom="@dimen/barcode_bottom_sheet_padding_vertical"
     android:background="@color/white"
+    android:gravity="center"
     android:orientation="vertical"
-    android:gravity="center">
+    android:paddingTop="@dimen/barcode_bottom_sheet_padding_vertical"
+    android:paddingBottom="@dimen/barcode_bottom_sheet_padding_vertical">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/barcode_field_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scrollbars="vertical"/>
+        android:scrollbars="vertical" />
+
     <Button
-        android:text="@string/confirm"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/btnConfirm" android:textAlignment="center"/>
+        android:text="@string/confirm"
+        android:textAlignment="center" />
 
 </LinearLayout>

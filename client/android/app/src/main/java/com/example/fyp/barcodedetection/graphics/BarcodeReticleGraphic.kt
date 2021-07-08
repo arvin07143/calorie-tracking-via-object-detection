@@ -8,7 +8,10 @@ import com.example.fyp.R
 import com.example.fyp.camera.CameraReticleAnimator
 import com.example.fyp.camera.GraphicOverlay
 
-internal class BarcodeReticleGraphic(overlay: GraphicOverlay, private val animator: CameraReticleAnimator) :
+internal class BarcodeReticleGraphic(
+    overlay: GraphicOverlay,
+    private val animator: CameraReticleAnimator,
+) :
     BarcodeGraphicBase(overlay) {
 
     private val ripplePaint: Paint
@@ -23,8 +26,10 @@ internal class BarcodeReticleGraphic(overlay: GraphicOverlay, private val animat
         ripplePaint.color = ContextCompat.getColor(context,
             R.color.reticle_ripple
         )
-        rippleSizeOffset = resources.getDimensionPixelOffset(R.dimen.barcode_reticle_ripple_size_offset)
-        rippleStrokeWidth = resources.getDimensionPixelOffset(R.dimen.barcode_reticle_ripple_stroke_width)
+        rippleSizeOffset =
+            resources.getDimensionPixelOffset(R.dimen.barcode_reticle_ripple_size_offset)
+        rippleStrokeWidth =
+            resources.getDimensionPixelOffset(R.dimen.barcode_reticle_ripple_stroke_width)
         rippleAlpha = ripplePaint.alpha
     }
 

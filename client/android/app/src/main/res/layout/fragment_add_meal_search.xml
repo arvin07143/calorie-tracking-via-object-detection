@@ -9,10 +9,10 @@
         tools:context=".AddMealSearchFragment">
 
         <androidx.recyclerview.widget.RecyclerView
-            android:layout_marginTop="8dp"
             android:id="@+id/search_result_recycler"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginTop="8dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
     </FrameLayout>

@@ -15,7 +15,7 @@ class Converter {
     }
 
     @TypeConverter
-    fun mealListToString(itemList: MutableList<MealItem>):String{
+    fun mealListToString(itemList: MutableList<MealItem>): String {
         return Gson().toJson(itemList)
     }
 

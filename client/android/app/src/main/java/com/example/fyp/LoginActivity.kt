@@ -19,7 +19,7 @@ class LoginActivity : AppCompatActivity() {
         val navController = navHostFragment.navController
 
         setContentView(binding.root)
-        Log.e("a","ACTIVITY CREATE")
+        Log.e("a", "ACTIVITY CREATE")
     }
 
 }

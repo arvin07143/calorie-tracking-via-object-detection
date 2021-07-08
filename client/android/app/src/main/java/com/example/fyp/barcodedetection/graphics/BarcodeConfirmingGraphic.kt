@@ -5,7 +5,10 @@ import android.graphics.Path
 import com.example.fyp.camera.GraphicOverlay
 import com.google.mlkit.vision.barcode.Barcode
 
-internal class BarcodeConfirmingGraphic(private val overlay: GraphicOverlay, private val barcode: Barcode) :
+internal class BarcodeConfirmingGraphic(
+    private val overlay: GraphicOverlay,
+    private val barcode: Barcode,
+) :
     BarcodeGraphicBase(overlay) {
 
     override fun draw(canvas: Canvas) {
@@ -33,7 +36,10 @@ internal class BarcodeConfirmingGraphic(private val overlay: GraphicOverlay, pri
         canvas.drawPath(path, pathPaint)
     }
 
-    private fun getProgressToMeetBarcodeSizeRequirement(overlay: GraphicOverlay, barcode: Barcode): Float {
+    private fun getProgressToMeetBarcodeSizeRequirement(
+        overlay: GraphicOverlay,
+        barcode: Barcode,
+    ): Float {
         return 1f
     }
 }

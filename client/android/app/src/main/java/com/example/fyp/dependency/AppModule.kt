@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.room.Room
 import com.example.fyp.AppExecutors
+import com.example.fyp.data.local.GoalDAO
 import com.example.fyp.data.local.MealDAO
 import com.example.fyp.data.local.MealDatabase
 import com.example.fyp.data.remote.MealService
@@ -76,7 +77,7 @@ object AppModule {
 
     @Provides
     fun provideAppDatabase(@ApplicationContext context: Context): MealDatabase {
-        return Room.databaseBuilder(context, MealDatabase::class.java, "testdb")
+        return Room.databaseBuilder(context, MealDatabase::class.java, "my_db")
             .fallbackToDestructiveMigration()
             .build()
     }
@@ -89,8 +90,14 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun provideSharedPreference(@ApplicationContext context: Context):SharedPreferences{
-        return context.getSharedPreferences("user_data",Context.MODE_PRIVATE)
+    fun provideGoalDAO(db: MealDatabase): GoalDAO{
+        return db.goalDao()
+    }
+
+    @Singleton
+    @Provides
+    fun provideSharedPreference(@ApplicationContext context: Context): SharedPreferences {
+        return context.getSharedPreferences("user_data", Context.MODE_PRIVATE)
     }
 
     @Singleton
@@ -99,8 +106,8 @@ object AppModule {
         appExecutors: AppExecutors,
         remoteDataSource: MealService,
         localDataSource: MealDAO,
-        sharedPreferences: SharedPreferences
+        sharedPreferences: SharedPreferences,
     ): MealRepository {
-        return MealRepository(appExecutors, remoteDataSource, localDataSource,sharedPreferences)
+        return MealRepository(appExecutors, remoteDataSource, localDataSource, sharedPreferences)
     }
 }

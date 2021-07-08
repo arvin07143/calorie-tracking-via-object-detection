@@ -24,7 +24,7 @@ class MyBarcodeScanner constructor(
     private val _imageBackpressureStrategy: Int,
     private val _analyzer: ImageAnalysis.Analyzer,
     private val _imageExecutor: Executor,
-    private val _lifecycleOwner: LifecycleOwner
+    private val _lifecycleOwner: LifecycleOwner,
 ) {
 
     private val _cameraProviderFuture: ListenableFuture<ProcessCameraProvider> =
@@ -145,7 +145,7 @@ class MyBarcodeScanner constructor(
          */
         fun setImageAnalyzer(
             analyzer: ImageAnalysis.Analyzer,
-            executor: Executor = ContextCompat.getMainExecutor(context)
+            executor: Executor = ContextCompat.getMainExecutor(context),
         ): Builder {
             _analyzer = analyzer
             _imageExecutor = executor

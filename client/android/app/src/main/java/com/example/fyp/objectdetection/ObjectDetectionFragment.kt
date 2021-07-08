@@ -131,7 +131,7 @@ class ObjectDetectionFragment : Fragment() {
     /** Initialize CameraX, and prepare to bind the camera use cases  */
     private fun setUpCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
-        cameraProviderFuture.addListener(Runnable {
+        cameraProviderFuture.addListener({
 
             // CameraProvider
             cameraProvider = cameraProviderFuture.get()
@@ -183,7 +183,7 @@ class ObjectDetectionFragment : Fragment() {
         // ImageCapture
         imageCapture = ImageCapture.Builder()
             .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
-            .setTargetResolution(Size(640,640))
+            .setTargetResolution(Size(640, 640))
             // We request aspect ratio but no resolution to match preview config, but letting
             // CameraX optimize for whatever specific resolution best fits our use cases
             // Set initial target rotation, we will have to call this again if rotation changes
@@ -234,8 +234,8 @@ class ObjectDetectionFragment : Fragment() {
 
                     // Create output options object which contains file + metadata
                     val contentValues = ContentValues()
-                    contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, Date().toString());
-                    contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg");
+                    contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, Date().toString())
+                    contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
                     val outputFileOptions = ImageCapture.OutputFileOptions.Builder(
                         requireContext().contentResolver,
                         MediaStore.Images.Media.EXTERNAL_CONTENT_URI,

@@ -15,8 +15,6 @@ import com.google.android.material.tabs.TabLayoutMediator
 import com.google.firebase.auth.FirebaseAuth
 import com.squareup.picasso.Picasso
 import dagger.hilt.android.AndroidEntryPoint
-import java.time.LocalDate
-import java.time.Period
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -25,6 +23,7 @@ class UserProfile : Fragment() {
     lateinit var repository: MealRepository
     lateinit var binding: FragmentUserProfileBinding
 
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -32,14 +31,9 @@ class UserProfile : Fragment() {
     ): View {
         binding = FragmentUserProfileBinding.inflate(layoutInflater)
 
-        Picasso.get().load(FirebaseAuth.getInstance().currentUser?.photoUrl).into(binding.imageView)
-        repository.getUserProfileInfo().let {
-            binding.tvHeight.text = it.height.toString()
-            binding.tvWeight.text = it.weight.toString()
-            binding.tvAge.text = Period.between(
-                LocalDate.of(it.dob.year + 1900, it.dob.month + 1, it.dob.date), LocalDate.now()
-            ).years.toString()
-        }
+        Picasso.get().load(FirebaseAuth.getInstance().currentUser?.photoUrl)
+            .into(binding.profilePicture)
+        binding.tvName.text = FirebaseAuth.getInstance().currentUser?.displayName
 
         return binding.root
     }

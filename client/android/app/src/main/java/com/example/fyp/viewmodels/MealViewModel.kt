@@ -1,7 +1,5 @@
 package com.example.fyp.viewmodels
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.fyp.data.repository.MealRepository
@@ -11,18 +9,18 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MealViewModel @Inject constructor(
-    val repo: MealRepository
+    val repo: MealRepository,
 ) : ViewModel() {
 
     val todayMeals = repo.getTodayMeals()
 
-    fun deleteAll(){
+    fun deleteAll() {
         viewModelScope.launch {
             repo.deleteAllMeals()
         }
     }
 
-    fun addGoal(){
+    fun addGoal() {
 
     }
 

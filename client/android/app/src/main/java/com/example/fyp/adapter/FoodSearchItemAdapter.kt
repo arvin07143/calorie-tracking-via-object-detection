@@ -10,19 +10,19 @@ import com.example.fyp.R
 import com.example.fyp.data.entities.FoodSearchResultList
 import com.example.fyp.data.entities.MealItem
 
-class FoodSearchItemAdapter: RecyclerView.Adapter<FoodSearchItemAdapter.ItemViewHolder>() {
+class FoodSearchItemAdapter : RecyclerView.Adapter<FoodSearchItemAdapter.ItemViewHolder>() {
 
     lateinit var onItemClickListener: OnItemClickListener
-    var dataset : FoodSearchResultList? = null
+    var dataset: FoodSearchResultList? = null
 
-    class ItemViewHolder(itemView:View):RecyclerView.ViewHolder(itemView){
+    class ItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val itemName: TextView = itemView.findViewById(R.id.list_item_name)
         val itemCalories: TextView = itemView.findViewById(R.id.list_item_calorie)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
-        val view = layoutInflater.inflate(R.layout.meal_item_list,parent,false)
+        val view = layoutInflater.inflate(R.layout.meal_item_list, parent, false)
 
         return ItemViewHolder(view)
     }
@@ -33,10 +33,10 @@ class FoodSearchItemAdapter: RecyclerView.Adapter<FoodSearchItemAdapter.ItemView
         results?.let {
             holder.itemName.text = it[position].itemName
             holder.itemCalories.text = it[position].itemCalories.toString()
-            Log.e("bind",position.toString())
+            Log.e("bind", position.toString())
 
-            holder.itemView.setOnClickListener{
-                val mealItem = MealItem(results[position].itemName,results[position].itemCalories)
+            holder.itemView.setOnClickListener {
+                val mealItem = MealItem(results[position].itemName, results[position].itemCalories)
                 onItemClickListener.addNewItem(mealItem)
             }
         }

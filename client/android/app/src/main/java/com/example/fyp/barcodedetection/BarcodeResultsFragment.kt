@@ -14,15 +14,15 @@ import com.example.fyp.R
 import com.example.fyp.adapter.BarcodeFieldAdapter
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
-class BarcodeResultsFragment : BottomSheetDialogFragment(){
+class BarcodeResultsFragment : BottomSheetDialogFragment() {
 
-    private val barcodeScanningViewModel : BarcodeScanningViewModel by activityViewModels()
+    private val barcodeScanningViewModel: BarcodeScanningViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? {
-        val view = layoutInflater.inflate(R.layout.fragment_barcode_results,container)
+        val view = layoutInflater.inflate(R.layout.fragment_barcode_results, container)
         val arguments = arguments
 
         val itemName =
@@ -41,7 +41,7 @@ class BarcodeResultsFragment : BottomSheetDialogFragment(){
                 0
             }
 
-        val itemPair = Pair(itemName,itemCalories)
+        val itemPair = Pair(itemName, itemCalories)
         // Inflate the layout for this fragment
         view.findViewById<RecyclerView>(R.id.barcode_field_recycler_view).apply {
             setHasFixedSize(true)
@@ -73,7 +73,7 @@ class BarcodeResultsFragment : BottomSheetDialogFragment(){
         fun show(
             itemName: String,
             itemCalories: Int,
-            fragmentManager: FragmentManager
+            fragmentManager: FragmentManager,
         ) {
             val barcodeResultFragment = BarcodeResultsFragment()
             barcodeResultFragment.apply {

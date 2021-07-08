@@ -1,7 +1,7 @@
 package com.example.fyp
 
-import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -31,6 +31,9 @@ class LoginFragment : Fragment() {
     @Inject
     lateinit var webAPI: WebAPI
 
+    @Inject
+    lateinit var sharedPreferences: SharedPreferences
+
     private lateinit var auth: FirebaseAuth
     private lateinit var googleSignInClient: GoogleSignInClient
     private lateinit var binding: FragmentLoginBinding
@@ -43,8 +46,6 @@ class LoginFragment : Fragment() {
             GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id)).build()
         googleSignInClient = GoogleSignIn.getClient(requireContext(), gso)
-
-        Log.e("a", "FRAGMENT CREATE")
     }
 
     override fun onStart() {
@@ -121,7 +122,6 @@ class LoginFragment : Fragment() {
                     // Sign in success, update UI with the signed-in user's information
                     checkUserInformation()
                     Log.d(TAG, "signInWithCredential:success")
-                    val user = auth.currentUser
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.w(TAG, "signInWithCredential:failure", task.exception)
@@ -147,20 +147,16 @@ class LoginFragment : Fragment() {
                 ) {
                     if (response.isSuccessful) {
                         val userInformation = response.body()
-                        val sharedPref = activity?.getPreferences(Context.MODE_PRIVATE)
                         if (userInformation != null) {
-                            with(sharedPref!!.edit()) {
-                                putString("uid", userInformation.uid)
-                                putLong("dob", userInformation.dob.time)
-                                putInt("height", userInformation.height)
-                                putFloat("weight", userInformation.weight)
-                                putInt("gender", userInformation.gender)
-                                putBoolean("SIGNED IN", true)
-                                apply()
-                            }
+                            Utils.saveDataToSharedPreference(
+                                sharedPreferences,
+                                userInformation.uid!!,
+                                userInformation.gender,
+                                userInformation.height,
+                                userInformation.weight,
+                                userInformation.dob
+                            )
                             findNavController().navigate(R.id.action_loginFragment_to_mainActivity)
-                        } else {
-                            findNavController().navigate(R.id.action_loginFragment_to_registerInformationFragment)
                         }
                     }
                 }
@@ -175,8 +171,7 @@ class LoginFragment : Fragment() {
     }
 
     private fun userPreviouslySignedIn(): Boolean {
-        val sharedPref = activity?.getPreferences(Context.MODE_PRIVATE) ?: return false
-        return sharedPref.getBoolean("SIGNED IN", false)
+        return sharedPreferences.getBoolean("SIGNED IN", false)
     }
 
     companion object {

@@ -12,8 +12,6 @@ import com.example.fyp.data.local.MealDAO
 import com.example.fyp.data.remote.MealService
 import com.example.fyp.utils.NetworkBoundResource
 import com.example.fyp.utils.Resource
-import com.google.firebase.auth.FirebaseAuth
-import com.google.gson.JsonObject
 import okhttp3.ResponseBody
 import org.json.JSONObject
 import retrofit2.Call
@@ -26,7 +24,7 @@ class MealRepository @Inject constructor(
     private val appExecutors: AppExecutors,
     private val remoteSource: MealService,
     private val localSource: MealDAO,
-    private val sharedPreferences: SharedPreferences
+    private val sharedPreferences: SharedPreferences,
 ) {
 
     companion object {
@@ -63,8 +61,8 @@ class MealRepository @Inject constructor(
         return localSource.getTodayMealByType(mealType)
     }
 
-    fun deleteAllMeals(){
-        appExecutors.diskIO().execute{
+    fun deleteAllMeals() {
+        appExecutors.diskIO().execute {
             localSource.deleteAll()
         }
 
@@ -74,7 +72,7 @@ class MealRepository @Inject constructor(
         val meal =
             Meal(mealContent = mealContent, mealTime = Date(), mealType = mealType, mealID = null)
 
-        appExecutors.diskIO().execute{
+        appExecutors.diskIO().execute {
             localSource.createMeal(meal)
         }
 
@@ -97,26 +95,28 @@ class MealRepository @Inject constructor(
         })
     }
 
-    fun addItemToMeal(currentMeal: Meal,addedItem: List<MealItem>){
+    fun addItemToMeal(currentMeal: Meal, addedItem: List<MealItem>) {
         currentMeal.mealContent.addAll(addedItem)
         appExecutors.diskIO().execute {
             localSource.updateMeal(currentMeal)
         }
 
         currentMeal.let {
-            val call = remoteSource.insertMealItem(userId = "me",mealID = it.mealID!!,mealItem = addedItem)
-            call.enqueue(object : Callback<ResponseBody>{
+            val call = remoteSource.insertMealItem(userId = "me",
+                mealID = it.mealID!!,
+                mealItem = addedItem)
+            call.enqueue(object : Callback<ResponseBody> {
                 override fun onResponse(
                     call: Call<ResponseBody>,
                     response: Response<ResponseBody>,
                 ) {
-                    if (response.isSuccessful){
-                        Log.i("ADD MEAL ITEM","SUCCESS")
+                    if (response.isSuccessful) {
+                        Log.i("ADD MEAL ITEM", "SUCCESS")
                     }
                 }
 
                 override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                    Log.e("ADD MEAL ITEM",t.message.toString())
+                    Log.e("ADD MEAL ITEM", t.message.toString())
                 }
 
             })
@@ -124,11 +124,15 @@ class MealRepository @Inject constructor(
 
     }
 
-    fun getUserProfileInfo() : UserInformation{
+    fun getUserProfileInfo(): UserInformation {
         val height = sharedPreferences.getInt("height", 0)
         val weight = sharedPreferences.getFloat("weight", 0F)
-        val dob = sharedPreferences.getLong("dob",0)
+        val dob = sharedPreferences.getLong("dob", 0)
 
-        return UserInformation(weight = weight,height = height,dob = Date(dob),gender = 0,uid="")
+        return UserInformation(weight = weight,
+            height = height,
+            dob = Date(dob),
+            gender = 0,
+            uid = "")
     }
 }

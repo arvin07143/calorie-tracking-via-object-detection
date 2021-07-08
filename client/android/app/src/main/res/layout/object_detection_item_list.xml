@@ -1,34 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_margin="8dp"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp">
 
     <include
-        android:id="@+id/detected_items"
         layout="@layout/meal_item_list"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
         android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
         android:layout_marginEnd="8dp"
         android:layout_toStartOf="@+id/btn_edit_object" />
 
     <ImageButton
         android:id="@+id/btn_delete_objet"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
-        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
         android:src="@drawable/ic_baseline_remove_24" />
 
     <ImageButton
         android:id="@+id/btn_edit_object"
-        android:layout_width="wrap_content"
-        android:src="@drawable/ic_baseline_edit_24"
         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-        android:layout_toStartOf="@id/btn_delete_objet"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        />
-    
+        android:layout_toStartOf="@id/btn_delete_objet"
+        android:src="@drawable/ic_baseline_edit_24" />
+
 </RelativeLayout>

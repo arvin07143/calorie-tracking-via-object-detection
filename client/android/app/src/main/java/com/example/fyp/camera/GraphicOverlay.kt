@@ -41,6 +41,7 @@ class GraphicOverlay(context: Context?, attrs: AttributeSet?) :
     abstract class Graphic(private val overlay: GraphicOverlay) {
 
         protected val context: Context = overlay.context
+
         /**
          * Draw the graphic on the supplied canvas. Drawing should use the following methods to convert
          * to view coordinates for the graphics that are drawn:

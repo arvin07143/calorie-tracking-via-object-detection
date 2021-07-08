@@ -9,11 +9,10 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.fyp.R
 import com.example.fyp.databinding.EditFoodDetailsDialogBinding
-import com.example.fyp.objectdetection.DetectedObject
 import com.example.fyp.objectdetection.DetectedObjectList
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
-class ObjectDetectionItemAdapter() :
+class ObjectDetectionItemAdapter :
     RecyclerView.Adapter<ObjectDetectionItemAdapter.ItemViewHolder>() {
 
     var detectedObjectList: DetectedObjectList? = null

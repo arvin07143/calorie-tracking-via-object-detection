@@ -9,7 +9,7 @@ class Config(object):
     USER_PASSWORD = 'arvinng07143'
     DB_NAME = 'mydb'
     NUTRITIONIX_APP_ID = '0b6fab2a'
-    NUTRITIONIX_API_KEY = '5468ce4133bea2bc4c73132bac529470'
+    NUTRITIONIX_API_KEY = '085d644e439a714953ab674a74c83ddc'
     NUTRITIONIX_API_URL = 'https://api.nutritionix.com/v1_1/search'
     FIREBASE_ADMIN_CRED_PATH = 'final-year-project-857e3-firebase-adminsdk-bg3u9-be02fa831b.json'
     TF_SERVER_URL = "http://localhost:8501/v1/models/my_model:predict"

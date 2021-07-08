@@ -16,7 +16,8 @@
         android:theme="@style/Theme.Fyp"
         android:usesCleartextTraffic="true"
         tools:targetApi="m">
-        <activity android:name=".objectdetection.ObjectDetectionActivity"
+        <activity
+            android:name=".objectdetection.ObjectDetectionActivity"
             android:screenOrientation="fullSensor">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -36,15 +37,9 @@
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity"
+        <activity
+            android:name=".MainActivity"
             android:windowSoftInputMode="adjustPan">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".MainActivity2">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
