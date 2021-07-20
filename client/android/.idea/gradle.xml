@@ -11,6 +11,7 @@
           <set>
             <option value="/mnt/9CB8BDB8B8BD90EE/Work Files/Final Year Project/fyp-repo/client/android" />
             <option value="/mnt/9CB8BDB8B8BD90EE/Work Files/Final Year Project/fyp-repo/client/android/app" />
+            <option value="/mnt/9CB8BDB8B8BD90EE/Work Files/Final Year Project/fyp-repo/client/android/percentageView" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

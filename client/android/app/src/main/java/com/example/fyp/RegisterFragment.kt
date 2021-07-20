@@ -18,7 +18,7 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
 import dagger.hilt.android.AndroidEntryPoint
-import org.json.JSONObject
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -66,12 +66,15 @@ class RegisterFragment : Fragment() {
         binding.heightPicker.setFormatter {
             resources.getString(R.string.height_value, it)
         }
+        binding.heightPicker.wrapSelectorWheel = false
 
         binding.weightPicker.minValue = 30
         binding.weightPicker.maxValue = 200
-        binding.heightPicker.setFormatter {
-            resources.getString(R.string.height_value, it)
+        binding.weightPicker.setFormatter {
+            resources.getString(R.string.weight_value, it)
         }
+
+        binding.weightPicker.wrapSelectorWheel = false
 
         binding.btnRegisterFinish.setOnClickListener {
             register()
@@ -87,13 +90,13 @@ class RegisterFragment : Fragment() {
         val confirmPassword = binding.textConfirmPassword.editText?.text.toString()
 
         if (!Utils.isPasswordSame(password, confirmPassword)) {
-            //validate
+            binding.textConfirmPassword.error = "Passwords are not the same"
 
             return false
         }
 
         if (!Utils.isValidEmail(email)) {
-            //validate
+            binding.textEmail.error = "Email is not valid"
 
             return false
         }
@@ -107,6 +110,9 @@ class RegisterFragment : Fragment() {
                 saveProfileData()
             }
         }
+            .addOnFailureListener {
+                Log.e("REG", it.message.toString())
+            }
         return true
     }
 
@@ -117,7 +123,7 @@ class RegisterFragment : Fragment() {
         val weight = binding.weightPicker.value
         val currentsdf = SimpleDateFormat.getDateInstance()
         val serversdf = SimpleDateFormat("yyyy-MM-dd")
-        val dob = serversdf.format(currentsdf.parse(binding.textDob.editText?.text.toString()))
+        val dob = serversdf.parse(binding.textDob.editText?.text.toString())
         val gender = when (binding.genderSelect.checkedButtonId) {
             R.id.btnMale -> 0
             R.id.btnFemale -> 1
@@ -125,24 +131,30 @@ class RegisterFragment : Fragment() {
         }
 
         val userInformation =
-            UserInformation(uid, gender, height, weight.toFloat(), Date(dob))
+            UserInformation(uid,
+                gender,
+                height,
+                weight.toFloat(),
+                dob)
 
-        saveDataToSharedPreference(sharedPreferences,
-            uid,
-            gender,
-            height,
-            weight.toFloat(),
-            Date(dob))
+        userInformation.dateOfBirth?.let {
+            saveDataToSharedPreference(sharedPreferences,
+                uid,
+                gender,
+                height,
+                weight.toFloat(),
+                it)
+        }
 
         val registerCall = webAPI.registerNewUser(userInformation)
 
-        registerCall.enqueue(object : Callback<JSONObject> {
-            override fun onResponse(call: Call<JSONObject>, response: Response<JSONObject>) {
+        registerCall.enqueue(object : Callback<ResponseBody> {
+            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                 Toast.makeText(requireContext(), "Registration Complete", Toast.LENGTH_SHORT).show()
                 findNavController().navigate(R.id.action_register_to_mainActivity)
             }
 
-            override fun onFailure(call: Call<JSONObject>, t: Throwable) {
+            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
                 Log.e("REGISTER", t.message.toString())
             }
         })

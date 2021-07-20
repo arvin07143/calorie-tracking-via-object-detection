@@ -151,10 +151,10 @@ class LoginFragment : Fragment() {
                             Utils.saveDataToSharedPreference(
                                 sharedPreferences,
                                 userInformation.uid!!,
-                                userInformation.gender,
-                                userInformation.height,
-                                userInformation.weight,
-                                userInformation.dob
+                                userInformation.gender!!,
+                                userInformation.height!!,
+                                userInformation.weight!!,
+                                userInformation.dateOfBirth!!
                             )
                             findNavController().navigate(R.id.action_loginFragment_to_mainActivity)
                         }

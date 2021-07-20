@@ -3,11 +3,11 @@ package com.example.fyp
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.onNavDestinationSelected
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.example.fyp.data.repository.MealRepository
 import com.example.fyp.databinding.FragmentUserProfileBinding
@@ -23,6 +23,20 @@ class UserProfile : Fragment() {
     lateinit var repository: MealRepository
     lateinit var binding: FragmentUserProfileBinding
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.top_nav, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val navController = findNavController()
+        return item.onNavDestinationSelected(navController) || super.onOptionsItemSelected(item)
+    }
+
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
@@ -31,8 +45,13 @@ class UserProfile : Fragment() {
     ): View {
         binding = FragmentUserProfileBinding.inflate(layoutInflater)
 
-        Picasso.get().load(FirebaseAuth.getInstance().currentUser?.photoUrl)
-            .into(binding.profilePicture)
+        if (FirebaseAuth.getInstance().currentUser?.photoUrl == null) {
+            binding.profilePicture.setImageResource(R.drawable.ic_baseline_account_circle_24)
+        } else {
+            Picasso.get().load(FirebaseAuth.getInstance().currentUser?.photoUrl)
+                .into(binding.profilePicture)
+        }
+
         binding.tvName.text = FirebaseAuth.getInstance().currentUser?.displayName
 
         return binding.root

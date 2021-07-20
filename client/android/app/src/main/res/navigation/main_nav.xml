@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+<navigation
+    android:id="@+id/main_nav"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     app:startDestination="@id/home">
@@ -40,4 +42,18 @@
     <action
         android:id="@+id/action_global_userProfile"
         app:destination="@id/userProfile" />
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.example.fyp.SettingsFragment"
+        android:label="SettingsFragment" >
+        <action
+            android:id="@+id/action_settingsFragment_to_loginActivity"
+            app:destination="@id/loginActivity"
+            />
+    </fragment>
+    <action android:id="@+id/action_global_settingsFragment" app:destination="@id/settingsFragment" />
+    <activity
+        android:id="@+id/loginActivity"
+        android:name="com.example.fyp.LoginActivity"
+        android:label="LoginActivity" />
 </navigation>

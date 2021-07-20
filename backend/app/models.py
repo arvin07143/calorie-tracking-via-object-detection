@@ -29,6 +29,7 @@ class User(db.Model):
     date_of_birth = db.Column(db.DateTime)
     goals = db.relationship("Goal")
     meals = db.relationship("Meal")
+    saved_items = db.relationship("SavedItems")
 
     # def __init__(self, uid, gender, height, weight, dob):
     #     self.uid = uid
@@ -45,13 +46,10 @@ class GoalEnum(enum.IntEnum):
 
 class Goal(db.Model):
     __tablename__ = 'goals'
-    id = db.Column(db.String, primary_key=True, autoincrement=True)
-    goal_name = db.Column(db.String)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     goal_type = db.Column(db.Enum(GoalEnum))
     goal_start_value = db.Column(db.Float)
     goal_end_value = db.Column(db.Float)
-    goal_start = db.Column(db.DateTime)
-    goal_end = db.Column(db.DateTime)
     user_id = db.Column(db.String, db.ForeignKey('users.uid'))
 
 
@@ -88,9 +86,9 @@ class Meal(db.Model):
     meal_items = db.relationship("MealItem")
     user_id = db.Column(db.String, db.ForeignKey('users.uid'))
 
-    # def __init__(self, meal_content, uid):
-    #     self.meal_content = meal_content
-    #     self.user_id = uid
 
-    # def __repr__(self):
-    #     return "ID : " + self.id + "\nContent : " + json.dumps(self.meal_content) + "\nUID : " + self.user_id
+class SavedItems(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    item_name = db.Column(db.String)
+    item_calorie = db.Column(db.Float)
+    user_id = db.Column(db.String, db.ForeignKey('users.uid'))

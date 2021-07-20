@@ -32,4 +32,8 @@ object Utils {
             apply()
         }
     }
+
+    fun calculatePercentage(minVal: Float, maxVal: Float, currentVal: Float): Int {
+        return (((currentVal - minVal) / (maxVal-minVal)) * 100).toInt()
+    }
 }

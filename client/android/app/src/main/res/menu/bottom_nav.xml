@@ -8,11 +8,6 @@
         android:title="Home" />
 
     <item
-        android:enabled="true"
-        android:icon="@drawable/ic_outline_assignment_24"
-        android:title="Journal" />
-
-    <item
         android:id="@+id/userProfile"
         android:enabled="true"
         android:icon="@drawable/ic_baseline_person_outline_24"

@@ -4,6 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".HomeFragment">
 
+    <data>
+        <variable
+            name="overflow"
+            type="boolean" />
+    </data>
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -70,6 +76,7 @@
                                 android:layout_height="250dp"
                                 android:layout_centerInParent="true"
                                 app:percentage="60"
+                                app:progressColor="@{overflow?@color/red:@color/black}"
                                 app:textColor="@color/white" />
 
                             <LinearLayout
@@ -144,6 +151,7 @@
                             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
                         <Button
+                            android:id="@+id/btn_add_breakfast"
                             style="@style/Widget.MaterialComponents.Button.TextButton"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -177,6 +185,7 @@
                             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
                         <Button
+                            android:id="@+id/btn_add_lunch"
                             style="@style/Widget.MaterialComponents.Button.TextButton"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -210,6 +219,7 @@
                             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
                         <Button
+                            android:id="@+id/btn_add_dinner"
                             style="@style/Widget.MaterialComponents.Button.TextButton"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"

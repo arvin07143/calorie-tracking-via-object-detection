@@ -47,7 +47,7 @@ class AddMealSearchFragment : Fragment(), OnItemClickListener,
         return binding.root
     }
 
-    override fun addNewItem(item: MealItem) {
+    override fun onClick(item: MealItem) {
         MaterialAlertDialogBuilder(requireContext())
             .setTitle("Add Meal")
             .setPositiveButton("Add") { _, _ ->

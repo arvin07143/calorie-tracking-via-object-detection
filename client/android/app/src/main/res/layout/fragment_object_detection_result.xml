@@ -55,10 +55,10 @@
 
                     <Button
                         android:id="@+id/object_detection_confirm"
+                        style="?android:attr/buttonBarButtonStyle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Confirm"
-                        style="?android:attr/buttonBarButtonStyle" />
+                        android:text="Confirm" />
 
                 </LinearLayout>
             </LinearLayout>

@@ -2,17 +2,20 @@ package com.example.fyp
 
 import android.os.Build
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.onNavDestinationSelected
 import com.example.fyp.adapter.MealItemAdapter
 import com.example.fyp.data.entities.MealItem
 import com.example.fyp.databinding.FragmentHomeBinding
 import com.example.fyp.databinding.GoalDialogBinding
+import com.example.fyp.utils.Utils
 import com.example.fyp.viewmodels.MealViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
@@ -25,12 +28,21 @@ import kotlin.math.roundToInt
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
 
-    private val viewModel: MealViewModel by viewModels()
+    private val viewModel: MealViewModel by activityViewModels()
     private lateinit var binding: FragmentHomeBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.top_nav, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val navController = findNavController()
+        return item.onNavDestinationSelected(navController) || super.onOptionsItemSelected(item)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -39,9 +51,23 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?,
     ): View {
         binding = FragmentHomeBinding.inflate(layoutInflater)
+        binding.overflow = false
         val breakfastAdapter = MealItemAdapter()
         val lunchAdapter = MealItemAdapter()
         val dinnerAdapter = MealItemAdapter()
+
+        var maxCalories = when (viewModel.getUserInformation().gender) {
+            0 -> 2500
+            else -> 2000
+        }
+        binding.caloriePercentageEnd.text = maxCalories.toString()
+
+        viewModel.calorieGoal.observe(viewLifecycleOwner, {
+            if (it != null) {
+                maxCalories = it.goalEndValue
+                binding.caloriePercentageEnd.text = it.goalEndValue.toString()
+            }
+        })
 
         binding.homeProfileName.text = getString(R.string.welcome,
             FirebaseAuth.getInstance().currentUser?.displayName)
@@ -60,7 +86,18 @@ class HomeFragment : Fragment() {
                         else -> dinnerAdapter.dataset = meal
                     }
                 }
-                updatePercentageUI(currentValue = totalCalories, maxValue = 1600.00)
+                binding.txtCurrentCalories.text =
+                    resources.getString(R.string.current_calorie_value, totalCalories.toInt())
+                val percentage = Utils.calculatePercentage(minVal = 0F,
+                    maxVal = maxCalories.toFloat(),
+                    currentVal = totalCalories.toFloat())
+                if (percentage > 100) {
+                    binding.overflow = true
+                    binding.caloriePercentageView.setPercentage(100)
+                } else {
+                    binding.caloriePercentageView.setPercentage(percentage)
+                }
+
             }
         })
 
@@ -85,6 +122,18 @@ class HomeFragment : Fragment() {
         binding.fabAddGoal.setOnClickListener {
             showAddGoalDialog()
         }
+
+        binding.btnAddBreakfast.setOnClickListener {
+            showAddMealDialog(0, mealTypeList[0])
+        }
+
+        binding.btnAddLunch.setOnClickListener {
+            showAddMealDialog(1, mealTypeList[1])
+        }
+
+        binding.btnAddDinner.setOnClickListener {
+            showAddMealDialog(2, mealTypeList[2])
+        }
         return binding.root
     }
 
@@ -104,11 +153,32 @@ class HomeFragment : Fragment() {
             }
         }
         MaterialAlertDialogBuilder(requireContext())
-            .setNegativeButton(resources.getString(R.string.cancel)) { dialog, which ->
+            .setNegativeButton(resources.getString(R.string.cancel)) { dialog, _ ->
                 dialog.dismiss()
             }
-            .setPositiveButton(resources.getString(R.string.confirm)) { dialog, which ->
-                // Respond to positive button press
+            .setPositiveButton(resources.getString(R.string.confirm)) { dialog, _ ->
+                val goalType = when (binding.goalRadioGroup.checkedRadioButtonId) {
+                    R.id.radio_weight_goal -> 0
+                    R.id.radio_calorie_goal -> 1
+                    else -> 2
+                }
+
+                val goalEndValue = binding.goalValueInput.editText?.text.toString().toInt()
+
+                val currentGoal = when (goalType) {
+                    0 -> viewModel.weightGoal
+                    1 -> viewModel.calorieGoal
+                    else -> TODO()
+                }
+
+                currentGoal.observeOnce(viewLifecycleOwner, {
+                    if (it != null) {
+                        viewModel.setGoal(goalType, null, goalEndValue, it.goalID)
+                    } else {
+                        viewModel.setGoal(goalType, null, goalEndValue, null)
+                    }
+                    dialog.dismiss()
+                })
             }
             .setView(binding.root)
             .show()
@@ -118,10 +188,12 @@ class HomeFragment : Fragment() {
         return mealContent.sumOf { it.calories.toDouble() }
     }
 
-    private fun updatePercentageUI(currentValue: Double, maxValue: Double) {
-        val percentage = currentValue / maxValue
-        binding.caloriePercentageView.setPercentage((percentage * 100).roundToInt())
-        binding.txtCurrentCalories.text =
-            resources.getString(R.string.current_calorie_value, currentValue.toInt())
+    private fun <T> LiveData<T>.observeOnce(lifecycleOwner: LifecycleOwner, observer: Observer<T>) {
+        observe(lifecycleOwner, object : Observer<T> {
+            override fun onChanged(t: T?) {
+                observer.onChanged(t)
+                removeObserver(this)
+            }
+        })
     }
 }

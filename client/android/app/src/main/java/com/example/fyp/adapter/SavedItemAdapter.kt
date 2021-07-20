@@ -7,13 +7,18 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.fyp.R
-import com.example.fyp.data.entities.FoodSearchResultList
 import com.example.fyp.data.entities.MealItem
+import com.example.fyp.data.entities.SavedItem
 
-class FoodSearchItemAdapter : RecyclerView.Adapter<FoodSearchItemAdapter.ItemViewHolder>() {
+class SavedItemAdapter : RecyclerView.Adapter<SavedItemAdapter.ItemViewHolder>() {
 
-    lateinit var onItemClickListener: OnItemClickListener
-    var dataset: FoodSearchResultList? = null
+    var onItemClickListener: OnItemClickListener? = null
+    var onItemUpdateClickListener: OnItemUpdateClickListener? = null
+    var dataset: List<SavedItem> = listOf()
+    set(value) {
+        field = value
+        notifyDataSetChanged()
+    }
 
     class ItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val itemName: TextView = itemView.findViewById(R.id.list_item_name)
@@ -29,22 +34,22 @@ class FoodSearchItemAdapter : RecyclerView.Adapter<FoodSearchItemAdapter.ItemVie
 
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
 
-        val results = dataset?.list
-        results?.let {
-            holder.itemName.text = it[position].itemName
-            holder.itemCalories.text = it[position].itemCalories.toString()
+        dataset.let { list ->
+            holder.itemName.text = list[position].foodName
+            holder.itemCalories.text = list[position].calories.toString()
             holder.itemView.setOnClickListener {
-                val mealItem = MealItem(results[position].itemName, results[position].itemCalories)
-                onItemClickListener.onClick(mealItem)
+                val mealItem = MealItem(dataset[position].foodName, dataset[position].calories)
+                onItemClickListener?.onClick(mealItem)
+                onItemUpdateClickListener?.onClick(savedItem = list[position])
             }
         }
     }
 
     override fun getItemCount(): Int {
-        return dataset?.list?.size ?: 0
+        return dataset.size
     }
 }
 
-interface OnItemClickListener {
-    fun onClick(item: MealItem)
+interface OnItemUpdateClickListener{
+    fun onClick(savedItem: SavedItem)
 }

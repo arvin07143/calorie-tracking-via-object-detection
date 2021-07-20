@@ -140,7 +140,7 @@ class AddMealFragmentDialog : DialogFragment() {
 
     inner class PagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
 
-        val mFragments = arrayOf(AddMealSearchFragment(), AddMealCustomItemFragment())
+        val mFragments = arrayOf(AddMealSearchFragment(), AddMealCustomItemFragment() as Fragment)
 
         override fun getItemCount(): Int = mFragments.size
 
@@ -148,7 +148,6 @@ class AddMealFragmentDialog : DialogFragment() {
             Log.e("ATTACH", "ATTACH $position")
             return mFragments[position]
         }
-
     }
 
     interface SearchListener {

@@ -1,13 +1,10 @@
-import base64
 import datetime
-import json
-from io import BytesIO
 
 import numpy as np
 import requests
 from PIL import Image
 from firebase_admin import auth
-from flask import jsonify, flash
+from flask import jsonify
 from flask_sqlalchemy import *
 from object_detection.utils.label_map_util import create_category_index_from_labelmap
 from sqlalchemy import desc
@@ -50,11 +47,48 @@ def register_new_user():
         gender = data['gender']
         height = data['height']
         weight = data['weight']
-        date_of_birth = datetime.datetime.strptime(data['dob'], "%Y-%m-%d")
-        new_user = models.User(uid, models.GenderEnum(gender), height, weight, date_of_birth)
+        date = data['dob'].split('T')[0]
+        date_of_birth = datetime.datetime.strptime(date, "%Y-%m-%d")
+        new_user = models.User(uid=uid, gender=models.GenderEnum(gender), height=height, weight=weight,
+                               date_of_birth=date_of_birth)
         db.session.add(new_user)
         db.session.commit()
         return "User added successfully", 200
+
+
+@app.route("/users/<uid>", methods=['PUT'])
+def update_user(uid):
+    try:
+        uid = auth_api_key(request.headers['Authorization'])
+    except KeyError:
+        abort(401)
+
+    if uid is not None:
+        current_user = models.User.query.get_or_404(uid)
+        data = request.json
+
+        print(data)
+
+        if "gender" in data:
+            gender = data['gender']
+            current_user.gender = gender
+
+        if "height" in data:
+            height = data['height']
+            current_user.height = height
+
+        if "weight" in data:
+            weight = data['weight']
+            current_user.weight = weight
+
+        if "date" in data:
+            date = data['dob'].split('T')[0]
+            date_of_birth = datetime.datetime.strptime(date, "%Y-%m-%d")
+            current_user.date_of_birth = date_of_birth
+
+        db.session.commit()
+
+    return "User Update Successfully", 200
 
 
 @app.route("/users/<uid>", methods=['GET'])
@@ -68,7 +102,6 @@ def get_user_data(uid):
             user = models.User.query.get(uid)
 
         if user is not None:
-            print(type(user.date_of_birth))
             return jsonify(user)
         else:
             abort(404)
@@ -144,9 +177,120 @@ def add_new_meal(uid):
     meal = models.Meal.query.order_by(desc(models.Meal.meal_time)).filter_by(user_id=uid).first()
     return jsonify(meal_id=meal.id), 200
 
-@app.route("/users/<uid>/goals/",methods=["POST,PUT"])
+
+@app.route("/users/<uid>/goals/", methods=["POST"])
 def add_new_goal(uid):
-    pass
+    try:
+        uid = auth_api_key(request.headers['Authorization'])
+        data = request.json
+        goalType = data["goal_type"]
+        goalStartValue = data["goal_start"]
+        goalEndValue = data["goal_end"]
+
+        newGoal = models.Goal(goal_type=models.GoalEnum(goalType), goal_start_value=goalStartValue,
+                              goal_end_value=goalEndValue)
+        user = models.User.query.get_or_404(uid)
+
+        user.goals.append(newGoal)
+        db.session.commit()
+        goalID = newGoal.id
+
+    except KeyError as e:
+        print(e)
+        abort(401)
+
+    return jsonify(goal_id=goalID), 200
+
+
+@app.route("/users/<uid>/goals/<goal_id>", methods=["PUT"])
+def update_goal(uid, goal_id):
+    try:
+        uid = auth_api_key(request.headers['Authorization'])
+        data = request.json
+        goalType = data["goal_type"]
+        goalStartValue = data["goal_start"]
+        goalEndValue = data["goal_end"]
+
+        changedGoal = models.Goal.query.get_or_404(goal_id)
+
+        changedGoal.goal_start_value = goalStartValue
+        changedGoal.goal_end_value = goalEndValue
+
+        db.session.commit()
+        goalID = changedGoal.id
+
+    except KeyError as e:
+        print(e)
+        abort(401)
+
+    return jsonify(goal_id=goalID), 200
+
+
+@app.route("/users/<uid>/saved/", methods=["POST"])
+def add_new_saved_item(uid):
+    try:
+        uid = auth_api_key(request.headers['Authorization'])
+        data = request.json
+        meal_name = data["item_name"]
+        meal_calorie = data["calories"]
+
+        new_saved_item = models.SavedItems(item_name=meal_name, item_calorie=meal_calorie)
+        user = models.User.query.get_or_404(uid)
+
+        user.saved_items.append(new_saved_item)
+        db.session.commit()
+        item_id = new_saved_item.id
+
+    except KeyError as e:
+        print(e)
+        abort(401)
+
+    return jsonify(item_id=item_id), 200
+
+
+@app.route("/users/<uid>/goals/", methods=["GET"])
+def get_all_goals(uid):
+    try:
+        uid = auth_api_key(request.headers['Authorization'])
+        user = models.User.query.get_or_404(uid)
+        goals = models.Goal.query.with_parent(user).all()
+
+        output = []
+        for goal in goals:
+            json = dict()
+            json["goal_id"] = goal.id
+            json["goal_type"] = goal.goal_type
+            json["goal_start"] = goal.goal_start_value
+            json["goal_end"] = goal.goal_end_value
+            output.append(json)
+
+    except KeyError as e:
+        print(e)
+        abort(401)
+
+    return jsonify(output), 200
+
+
+@app.route("/users/<uid>/saved/", methods=["GET"])
+def get_all_saved_items(uid):
+    try:
+        uid = auth_api_key(request.headers['Authorization'])
+        user = models.User.query.get_or_404(uid)
+        saved_items = models.SavedItems.query.with_parent(user).all()
+
+        output = []
+        for item in saved_items:
+            json = dict()
+            json["saved_id"] = item.id
+            json["item_name"] = item.item_name
+            json["calories"] = item.item_calorie
+            output.append(json)
+
+    except KeyError as e:
+        print(e)
+        abort(401)
+
+    return jsonify(output), 200
 
 
 @app.route("/nutrition/search/<search_term>", methods=['GET'])

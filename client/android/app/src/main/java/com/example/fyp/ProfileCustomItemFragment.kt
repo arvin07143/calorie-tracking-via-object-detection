@@ -1,59 +1,98 @@
 package com.example.fyp
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import com.example.fyp.adapter.OnItemUpdateClickListener
+import com.example.fyp.adapter.SavedItemAdapter
+import com.example.fyp.data.entities.SavedItem
+import com.example.fyp.databinding.EditFoodDetailsDialogBinding
+import com.example.fyp.databinding.FragmentProfileCustomItemBinding
+import com.example.fyp.viewmodels.ProfileViewModel
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dagger.hilt.android.AndroidEntryPoint
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
+@AndroidEntryPoint
+class ProfileCustomItemFragment : Fragment(), OnItemUpdateClickListener {
 
-/**
- * A simple [Fragment] subclass.
- * Use the [ProfileCustomItemFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
-class ProfileCustomItemFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    lateinit var binding: FragmentProfileCustomItemBinding
+    val viewModel: ProfileViewModel by activityViewModels()
+    lateinit var foodAdapter: SavedItemAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_profile_custom_item, container, false)
+    ): View {
+        binding = FragmentProfileCustomItemBinding.inflate(layoutInflater)
+
+        foodAdapter = SavedItemAdapter().also {
+            it.onItemUpdateClickListener = this
+        }
+
+        viewModel.getSavedMeals().observe(viewLifecycleOwner, { resource ->
+            Log.e("CUSTOM", "CALLED")
+            resource.data?.let {
+                Log.e("CUSTOM", it.size.toString())
+                foodAdapter.dataset = it
+            }
+        })
+
+        binding.profileTomItemRecycler.adapter = foodAdapter
+
+        binding.addCustomItem.setOnClickListener {
+            val binding = EditFoodDetailsDialogBinding.inflate(layoutInflater)
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Add New Custom Item")
+                .setView(binding.root)
+                .setPositiveButton("Confirm"){_,_ ->
+                    val itemName = binding.foodNameField.editText?.text.toString()
+                    val itemCalorie = binding.calorieValueField.editText?.text.toString().toFloat()
+                    val savedItem = SavedItem(0,null,itemName,itemCalorie)
+                    viewModel.addSavedItem(savedItem)
+                }
+                .setNegativeButton("Cancel"){dialog,_ -> dialog.dismiss()}
+                .show()
+        }
+
+
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment ProfileCustomItemFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            ProfileCustomItemFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
+    override fun onClick(savedItem: SavedItem) {
+        val binding = EditFoodDetailsDialogBinding.inflate(layoutInflater)
+        val itemName = binding.foodNameField.editText
+        itemName?.setText(savedItem.foodName)
+        val itemCalorie = binding.calorieValueField.editText
+        itemCalorie?.setText(savedItem.calories.toString())
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Edit Custom Item")
+            .setView(binding.root)
+            .setNegativeButton("Cancel"){ dialog, _ ->
+                dialog.dismiss()
             }
+            .setPositiveButton("Confirm"){ _, _ ->
+                savedItem.calories = itemCalorie?.text.toString().toFloat()
+                savedItem.foodName = itemName?.text.toString()
+
+                viewModel.updateSavedMeal(savedItem)
+                foodAdapter.notifyDataSetChanged()
+            }
+            .setNeutralButton("Delete"){ _, _ ->
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle("Confirm Delete?")
+                    .setMessage("Are you sure that you want to delete this item? This action cannot be reverted.")
+                    .setPositiveButton("Confirm"){_,_ ->
+                        viewModel.deleteSavedMeal(savedItem)
+                        foodAdapter.notifyDataSetChanged()
+                    }
+                    .setNegativeButton("Cancel"){dialog,_ -> dialog.dismiss()}
+                    .show()
+            }
+            .show()
     }
+
 }

@@ -33,4 +33,20 @@ data class MealItem(
     val calories: Float,
 )
 
+@Entity(tableName = "saved_item")
+@JsonClass(generateAdapter = true)
+data class SavedItem(
+    @PrimaryKey(autoGenerate = true)
+    @Json(name = "saved_id")
+    var id: Int,
+    @Json(name = "id")
+    var serverID: Int?,
+    @Json(name = "item_name")
+    var foodName: String,
+    @Json(name = "calories")
+    var calories: Float,
+)
+
+
+
 

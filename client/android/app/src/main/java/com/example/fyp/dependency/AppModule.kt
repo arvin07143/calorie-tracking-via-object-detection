@@ -90,7 +90,7 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun provideGoalDAO(db: MealDatabase): GoalDAO{
+    fun provideGoalDAO(db: MealDatabase): GoalDAO {
         return db.goalDao()
     }
 
@@ -105,9 +105,16 @@ object AppModule {
     fun provideRepository(
         appExecutors: AppExecutors,
         remoteDataSource: MealService,
+        webAPI: WebAPI,
         localDataSource: MealDAO,
+        goalSource: GoalDAO,
         sharedPreferences: SharedPreferences,
     ): MealRepository {
-        return MealRepository(appExecutors, remoteDataSource, localDataSource, sharedPreferences)
+        return MealRepository(appExecutors,
+            remoteDataSource,
+            webAPI,
+            localDataSource,
+            goalSource,
+            sharedPreferences)
     }
 }

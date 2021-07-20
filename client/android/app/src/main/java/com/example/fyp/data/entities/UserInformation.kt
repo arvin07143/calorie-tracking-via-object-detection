@@ -7,9 +7,9 @@ import java.util.*
 @JsonClass(generateAdapter = true)
 data class UserInformation(
     val uid: String?,
-    val gender: Int,
-    val height: Int,
-    val weight: Float,
+    val gender: Int?,
+    val height: Int?,
+    val weight: Float?,
     @Json(name = "date_of_birth")
-    val dob: Date,
+    val dateOfBirth: Date?,
 )

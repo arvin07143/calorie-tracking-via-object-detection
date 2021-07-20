@@ -7,7 +7,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.fyp.data.entities.Meal
 import com.example.fyp.data.entities.MealItem
+import com.example.fyp.data.entities.SavedItem
 import com.example.fyp.data.repository.MealRepository
+import com.example.fyp.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -44,8 +46,13 @@ class AddMealViewModel @Inject constructor(private val mealRepo: MealRepository)
     fun addNewMeal() {
         viewModelScope.launch {
             Log.e("CREATE MEAL", "CALLED")
+            Log.e("CURRENT",currentMealType.value.toString())
             currentMealType.value?.let { mealRepo.createNewMeal(it, mealContent = mutableListOf()) }
         }
+    }
+
+    fun getSavedMeals(): LiveData<Resource<List<SavedItem>>> {
+        return mealRepo.getSavedItems()
     }
 
 

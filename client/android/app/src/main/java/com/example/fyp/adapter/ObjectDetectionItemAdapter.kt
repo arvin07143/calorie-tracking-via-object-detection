@@ -47,7 +47,6 @@ class ObjectDetectionItemAdapter :
                 }
             }
             notifyDataSetChanged()
-            Log.i("DATASET", detectedObjectList?.objectList?.size.toString())
         }
 
         holder.btnEditItem.setOnClickListener {
