@@ -12,7 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="start"
-        android:contentDescription="Close"
+        android:contentDescription="@string/close"
         android:padding="@dimen/top_action_button_padding"
         app:srcCompat="@drawable/ic_close_vd_white_24" />
 
@@ -23,7 +23,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="false"
-        android:contentDescription="Toggle Flash"
+        android:contentDescription="@string/toggle_flash"
         android:padding="@dimen/top_action_button_padding"
         app:srcCompat="@drawable/camera_flash" />
 

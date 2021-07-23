@@ -29,10 +29,9 @@ class ObjectDetectionActivity : AppCompatActivity() {
             val directions = intent.getParcelableExtra<Uri>("content")?.let {
                 Log.e("TEST", it.toString())
                 ObjectDetectionFragmentDirections.actionObjectDetectionFragmentToObjectDetectionResultFragment(
-                    it)
+                    it,true)
             }
             if (directions != null) {
-                Log.e("TEST", "nav")
                 navController.navigate(directions)
             }
         }

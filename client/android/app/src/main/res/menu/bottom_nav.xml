@@ -5,12 +5,12 @@
         android:id="@+id/home"
         android:enabled="true"
         android:icon="@drawable/ic_outline_home_24"
-        android:title="Home" />
+        android:title="@string/home" />
 
     <item
         android:id="@+id/userProfile"
         android:enabled="true"
         android:icon="@drawable/ic_baseline_person_outline_24"
-        android:title="Profile" />
+        android:title="@string/profile" />
 
 </menu>

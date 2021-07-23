@@ -24,7 +24,10 @@ import com.example.fyp.databinding.FragmentSettingsBinding
 import com.example.fyp.databinding.PickerDialogBinding
 import com.example.fyp.utils.Utils
 import com.example.fyp.viewmodels.SettingViewModel
+import com.google.android.material.datepicker.CalendarConstraints
+import com.google.android.material.datepicker.DateValidatorPointBackward
 import com.google.android.material.datepicker.MaterialDatePicker
+import com.google.android.material.datepicker.MaterialDatePicker.Builder.datePicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
@@ -35,6 +38,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
+import java.util.*
 
 
 @AndroidEntryPoint
@@ -67,7 +71,6 @@ class SettingsFragment : Fragment() {
         }
 
         binding.btnEditProfileName.setOnClickListener {
-            Log.e("ONCLICK", "HI")
             val binding = EditProfileNameBinding.inflate(layoutInflater)
             MaterialAlertDialogBuilder(requireContext())
                 .setTitle("Change Profile Name")
@@ -89,6 +92,9 @@ class SettingsFragment : Fragment() {
             val binding = PickerDialogBinding.inflate(layoutInflater)
             binding.numberPicker.minValue = 120
             binding.numberPicker.maxValue = 250
+            viewModel.getLiveSharedPreference().getInt("height",160).observe(viewLifecycleOwner){
+                binding.numberPicker.value = it
+            }
             binding.numberPicker.setFormatter {
                 resources.getString(R.string.height_value, it)
             }
@@ -114,6 +120,9 @@ class SettingsFragment : Fragment() {
             val binding = PickerDialogBinding.inflate(layoutInflater)
             binding.numberPicker.minValue = 30
             binding.numberPicker.maxValue = 200
+            viewModel.getLiveSharedPreference().getFloat("weight",60F).observe(viewLifecycleOwner){
+                binding.numberPicker.value = it.toInt()
+            }
             binding.numberPicker.setFormatter {
                 resources.getString(R.string.weight_value, it)
             }
@@ -184,7 +193,20 @@ class SettingsFragment : Fragment() {
         }
 
         binding.btnChangeDob.setOnClickListener {
-            MaterialDatePicker.Builder.datePicker().build().show()
+            val constraintsBuilder = CalendarConstraints.Builder().setValidator(DateValidatorPointBackward.now())
+            val datePicker = datePicker()
+                .setTitleText("Set Date of Birth")
+                .setCalendarConstraints(constraintsBuilder.build())
+                .setInputMode(MaterialDatePicker.INPUT_MODE_CALENDAR)
+                .build()
+
+            datePicker.addOnPositiveButtonClickListener {
+                viewModel.updateUserInformation(weight = null,
+                    gender = null,
+                    height = null,
+                    dateOfBirth = Date(it))
+            }
+            datePicker.show(requireActivity().supportFragmentManager,"tag")
         }
 
 

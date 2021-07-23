@@ -21,7 +21,7 @@ class ProfileCustomItemFragment : Fragment(), OnItemUpdateClickListener {
 
     lateinit var binding: FragmentProfileCustomItemBinding
     val viewModel: ProfileViewModel by activityViewModels()
-    lateinit var foodAdapter: SavedItemAdapter
+    private lateinit var foodAdapter: SavedItemAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

@@ -250,7 +250,7 @@ class ObjectDetectionFragment : Fragment() {
                                 Log.d(TAG, "Photo capture succeeded: $savedUri")
                                 val directions =
                                     ObjectDetectionFragmentDirections.actionObjectDetectionFragmentToObjectDetectionResultFragment(
-                                        savedUri)
+                                        savedUri,false)
                                 requireActivity().runOnUiThread {
                                     findNavController().navigate(directions)
                                 }
@@ -304,8 +304,6 @@ class ObjectDetectionFragment : Fragment() {
 
     companion object {
         private const val TAG = "CameraXBasic"
-        private const val FILENAME = "yyyy-MM-dd-HH-mm-ss-SSS"
-        private const val PHOTO_EXTENSION = ".jpg"
         private const val RATIO_4_3_VALUE = 4.0 / 3.0
         private const val RATIO_16_9_VALUE = 16.0 / 9.0
 

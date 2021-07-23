@@ -8,6 +8,7 @@ import com.example.fyp.data.repository.MealRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import me.ibrahimsn.library.LiveSharedPreferences
 import java.util.*
 import javax.inject.Inject
 
@@ -40,6 +41,10 @@ class SettingViewModel @Inject constructor(
             dateOfBirth = dateOfBirth)
 
         mealRepository.updateUserProfileInfo(updateInformation)
+    }
+
+    fun getLiveSharedPreference(): LiveSharedPreferences {
+        return mealRepository.getLiveSharedPreference()
     }
 
 }

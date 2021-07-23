@@ -121,7 +121,6 @@ class RegisterFragment : Fragment() {
         val uid = auth.currentUser!!.uid
         val height = binding.heightPicker.value
         val weight = binding.weightPicker.value
-        val currentsdf = SimpleDateFormat.getDateInstance()
         val serversdf = SimpleDateFormat("yyyy-MM-dd")
         val dob = serversdf.parse(binding.textDob.editText?.text.toString())
         val gender = when (binding.genderSelect.checkedButtonId) {

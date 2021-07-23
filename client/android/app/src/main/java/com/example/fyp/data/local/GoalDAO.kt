@@ -3,7 +3,6 @@ package com.example.fyp.data.local
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.example.fyp.data.entities.Goal
-import com.example.fyp.data.entities.Meal
 
 @Dao
 interface GoalDAO {

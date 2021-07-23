@@ -23,7 +23,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
-import kotlin.math.roundToInt
 
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
@@ -45,6 +44,7 @@ class HomeFragment : Fragment() {
         return item.onNavDestinationSelected(navController) || super.onOptionsItemSelected(item)
     }
 
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -52,20 +52,34 @@ class HomeFragment : Fragment() {
     ): View {
         binding = FragmentHomeBinding.inflate(layoutInflater)
         binding.overflow = false
+        val livePreference = viewModel.getLiveSharedPreference()
         val breakfastAdapter = MealItemAdapter()
         val lunchAdapter = MealItemAdapter()
         val dinnerAdapter = MealItemAdapter()
 
-        var maxCalories = when (viewModel.getUserInformation().gender) {
-            0 -> 2500
-            else -> 2000
-        }
+        var maxCalories = 2500
+        var percentage = 0
+        var totalCalories = 0.0
+        livePreference.getInt(key = "gender", defaultValue = 0).observe(viewLifecycleOwner, {
+            maxCalories = when (it) {
+                0 -> 2500
+                1 -> 2000
+                else -> 2500
+            }
+        })
         binding.caloriePercentageEnd.text = maxCalories.toString()
 
         viewModel.calorieGoal.observe(viewLifecycleOwner, {
             if (it != null) {
                 maxCalories = it.goalEndValue
-                binding.caloriePercentageEnd.text = it.goalEndValue.toString()
+
+                percentage = Utils.calculatePercentage(minVal = 0F,
+                    maxVal = maxCalories.toFloat(),
+                    currentVal = totalCalories.toFloat())
+
+                updateCalorieUI(percentage,
+                    endValue = it.goalEndValue,
+                    currentCalorie = totalCalories.toInt())
             }
         })
 
@@ -76,7 +90,6 @@ class HomeFragment : Fragment() {
         binding.homeDate.text = formatter.format(LocalDate.now())
 
         viewModel.todayMeals.observe(viewLifecycleOwner, { resource ->
-            var totalCalories = 0.0
             resource.let {
                 for (meal in it) {
                     totalCalories += getTotalCalories(mealContent = meal.mealContent)
@@ -86,18 +99,12 @@ class HomeFragment : Fragment() {
                         else -> dinnerAdapter.dataset = meal
                     }
                 }
-                binding.txtCurrentCalories.text =
-                    resources.getString(R.string.current_calorie_value, totalCalories.toInt())
-                val percentage = Utils.calculatePercentage(minVal = 0F,
+
+                percentage = Utils.calculatePercentage(minVal = 0F,
                     maxVal = maxCalories.toFloat(),
                     currentVal = totalCalories.toFloat())
-                if (percentage > 100) {
-                    binding.overflow = true
-                    binding.caloriePercentageView.setPercentage(100)
-                } else {
-                    binding.caloriePercentageView.setPercentage(percentage)
-                }
 
+                updateCalorieUI(percentage,totalCalories.toInt(), maxCalories)
             }
         })
 
@@ -195,5 +202,20 @@ class HomeFragment : Fragment() {
                 removeObserver(this)
             }
         })
+    }
+
+    private fun updateCalorieUI(percentage: Int, currentCalorie: Int, endValue: Int) {
+        binding.caloriePercentageView.setPercentage(percentage)
+        binding.caloriePercentageEnd.text = endValue.toString()
+        binding.txtCurrentCalories.text =
+            resources.getString(R.string.current_calorie_value, currentCalorie)
+
+        if (percentage > 100) {
+            binding.overflow = true
+            binding.caloriePercentageView.setPercentage(100)
+        } else {
+            binding.overflow = false
+            binding.caloriePercentageView.setPercentage(percentage)
+        }
     }
 }

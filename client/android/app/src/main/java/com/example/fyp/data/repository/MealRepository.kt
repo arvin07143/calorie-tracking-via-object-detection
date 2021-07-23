@@ -11,6 +11,7 @@ import com.example.fyp.data.remote.MealService
 import com.example.fyp.data.remote.WebAPI
 import com.example.fyp.utils.NetworkBoundResource
 import com.example.fyp.utils.Resource
+import me.ibrahimsn.library.LiveSharedPreferences
 import okhttp3.ResponseBody
 import org.json.JSONObject
 import retrofit2.Call
@@ -30,6 +31,12 @@ class MealRepository @Inject constructor(
 
     companion object {
         private const val TAG = "REPO"
+    }
+
+    private val liveSharedPreferences = LiveSharedPreferences(sharedPreferences)
+
+    fun getLiveSharedPreference(): LiveSharedPreferences {
+        return liveSharedPreferences
     }
 
     fun getAllMeals(): LiveData<Resource<List<Meal>>> {
@@ -143,10 +150,11 @@ class MealRepository @Inject constructor(
         }
 
         currentMeal.let {
-            val call = remoteSource.insertMealItem(userId = "me",
-                mealID = it.mealID!!,
-                mealItem = addedItem)
-            call.enqueue(object : Callback<ResponseBody> {
+            it.mealID?.let { it1 ->
+                remoteSource.insertMealItem(userId = "me",
+                    mealID = it1,
+                    mealItem = addedItem)
+            }?.enqueue(object : Callback<ResponseBody> {
                 override fun onResponse(
                     call: Call<ResponseBody>,
                     response: Response<ResponseBody>,

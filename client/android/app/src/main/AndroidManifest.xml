@@ -24,8 +24,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".barcodedetection.BarcodeScanningActivity"
-            android:label="@string/title_activity_barcode_scanning">
+            android:name=".barcodedetection.BarcodeScanningActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>

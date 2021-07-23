@@ -18,20 +18,20 @@
                 style="@style/TextAppearance.MaterialComponents.Headline6"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Goal Type : " />
+                android:text="@string/goal_type" />
 
             <RadioButton
                 android:id="@+id/radio_weight_goal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:checked="true"
-                android:text="Weight Goal" />
+                android:text="@string/weight_goal" />
 
             <RadioButton
                 android:id="@+id/radio_calorie_goal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Caloric Goal" />
+                android:text="@string/caloric_goal" />
 
         </RadioGroup>
 
@@ -40,7 +40,7 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Goal Value"
+            android:hint="@string/goal_value"
             app:suffixText="kg">
 
             <com.google.android.material.textfield.TextInputEditText

@@ -8,8 +8,10 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="red">#FF0000</color>
-
-
+    <color name="deep_orange_500">#FF5722</color>
+    <color name="orange_500">#FF9800</color>
+    <color name="green_500">#8BC34A</color>
+    <color name="cyan_500">#03A9F4</color>
     <color name="barcode_reticle_background">#99000000</color>
     <color name="barcode_reticle_stroke">#40000000</color>
     <color name="barcode_field_value">#797979</color>

@@ -26,4 +26,6 @@ class ProfileViewModel @Inject constructor(val mealRepository: MealRepository) :
     fun addSavedItem(savedItem: SavedItem){
         mealRepository.addSavedItem(savedItem)
     }
+
+    val liveSharedPreferences = mealRepository.getLiveSharedPreference()
 }

@@ -9,7 +9,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.example.fyp.R
 import com.example.fyp.adapter.ObjectDetectionItemAdapter
 import com.example.fyp.data.remote.WebAPI
 import com.example.fyp.databinding.FragmentObjectDetectionResultBinding
@@ -29,10 +31,12 @@ class ObjectDetectionResultFragment : Fragment() {
     private val args: ObjectDetectionResultFragmentArgs by navArgs()
     private lateinit var binding: FragmentObjectDetectionResultBinding
     private lateinit var imageUri: Uri
+    private var isFile = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         imageUri = args.imageUri
+        isFile = args.isFile
     }
 
     override fun onCreateView(
@@ -83,6 +87,14 @@ class ObjectDetectionResultFragment : Fragment() {
             }
             requireActivity().setResult(Activity.RESULT_OK, resultIntent)
             requireActivity().finish()
+        }
+
+        binding.objectDetectionCancel.setOnClickListener {
+            if (!isFile){
+                findNavController().navigate(R.id.action_objectDetectionResultFragment_to_objectDetectionFragment)
+            } else {
+                requireActivity().finish()
+            }
         }
 
         return binding.root

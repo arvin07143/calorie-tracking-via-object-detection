@@ -1,6 +1,5 @@
 package com.example.fyp.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,6 +9,7 @@ import com.example.fyp.data.repository.MealRepository
 import com.example.fyp.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import me.ibrahimsn.library.LiveSharedPreferences
 import javax.inject.Inject
 
 @HiltViewModel
@@ -54,6 +54,10 @@ class MealViewModel @Inject constructor(
             repo.addNewGoal(newGoal)
         }
 
+    }
+
+    fun getLiveSharedPreference(): LiveSharedPreferences {
+        return repo.getLiveSharedPreference()
     }
 
 

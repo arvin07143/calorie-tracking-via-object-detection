@@ -45,7 +45,7 @@
     <fragment
         android:id="@+id/settingsFragment"
         android:name="com.example.fyp.SettingsFragment"
-        android:label="SettingsFragment" >
+        android:label="Settings" >
         <action
             android:id="@+id/action_settingsFragment_to_loginActivity"
             app:destination="@id/loginActivity"

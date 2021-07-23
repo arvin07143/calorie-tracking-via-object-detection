@@ -20,5 +20,11 @@
         <argument
             android:name="imageUri"
             app:argType="android.net.Uri" />
+        <action
+            android:id="@+id/action_objectDetectionResultFragment_to_objectDetectionFragment"
+            app:destination="@id/objectDetectionFragment" />
+        <argument
+            android:name="isFile"
+            app:argType="boolean" />
     </fragment>
 </navigation>
