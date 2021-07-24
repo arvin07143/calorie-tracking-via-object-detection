@@ -21,8 +21,15 @@
             android:text="@string/add_item"
             android:layout_gravity="end"/>
 
+        <View
+            android:id="@+id/divider9"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/profile_tom_item_recycler"
+            android:layout_marginTop="8dp"
             android:layout_marginHorizontal="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

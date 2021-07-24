@@ -34,12 +34,16 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical">
 
-                <androidx.recyclerview.widget.RecyclerView
+                <com.cooltechworks.views.shimmer.ShimmerRecyclerView
                     android:id="@+id/detected_object_recycler"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    app:shimmer_demo_child_count="10"
+                    app:shimmer_demo_layout="@layout/layout_demo"
+                    app:shimmer_demo_layout_manager_type="linear_vertical"
+                    app:shimmer_demo_angle="20"/>
 
                 <LinearLayout
                     android:layout_width="wrap_content"

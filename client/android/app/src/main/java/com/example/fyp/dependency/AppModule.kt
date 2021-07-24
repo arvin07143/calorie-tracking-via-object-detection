@@ -49,7 +49,7 @@ object AppModule {
     @Singleton
     @Provides
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit = Retrofit.Builder()
-        .baseUrl("http://10.0.2.2:5000/")
+        .baseUrl("https://arvin07143-finalyearproject.herokuapp.com/")
         .client(okHttpClient)
         .addConverterFactory(
             MoshiConverterFactory.create(

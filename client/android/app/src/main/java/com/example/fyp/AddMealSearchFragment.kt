@@ -60,6 +60,7 @@ class AddMealSearchFragment : Fragment(), OnItemClickListener,
     }
 
     override fun search(searchTerm: String) {
+        binding.searchResultRecycler.showShimmerAdapter()
         val call = mealService.search(searchTerm)
         call.enqueue(object : Callback<FoodSearchResultList> {
             override fun onResponse(
@@ -69,6 +70,7 @@ class AddMealSearchFragment : Fragment(), OnItemClickListener,
                 if (response.isSuccessful) {
                     adapter.dataset = response.body()
                     adapter.notifyDataSetChanged()
+                    binding.searchResultRecycler.hideShimmerAdapter()
                 }
             }
 

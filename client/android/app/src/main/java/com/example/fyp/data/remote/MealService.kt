@@ -50,4 +50,11 @@ interface MealService {
         @Body savedItem: SavedItem,
     ): Call<ResponseBody>
 
+    @PUT("/users/{uid}/saved/{saved_item_id}")
+    fun updateSavedItem(
+        @Path(value = "uid") userId: String,
+        @Path(value = "saved_item_id") savedItemID: Int,
+        @Body savedItem: SavedItem,
+    ): Call<ResponseBody>
+
 }

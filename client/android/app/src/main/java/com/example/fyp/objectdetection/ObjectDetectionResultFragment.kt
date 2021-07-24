@@ -51,6 +51,7 @@ class ObjectDetectionResultFragment : Fragment() {
 
         val adapter = ObjectDetectionItemAdapter()
         binding.detectedObjectRecycler.adapter = adapter
+        binding.detectedObjectRecycler.showShimmerAdapter()
 
         val file = requireContext().contentResolver.openInputStream(imageUri)
 
@@ -69,6 +70,7 @@ class ObjectDetectionResultFragment : Fragment() {
                             adapter.detectedObjectList = response.body()
                             Log.i("DETECTED", response.body()!!.objectList.size.toString())
                             adapter.notifyDataSetChanged()
+                            binding.detectedObjectRecycler.hideShimmerAdapter()
                         }
 
                     }

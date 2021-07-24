@@ -44,6 +44,9 @@ interface MealDAO {
     @Query("DELETE FROM meals")
     fun deleteAll()
 
+    @Query("DELETE FROM saved_item")
+    fun deleteAllSavedItems()
+
     @Delete
     fun deleteSavedItem(savedItem: SavedItem)
 

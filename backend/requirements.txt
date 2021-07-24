@@ -1,7 +1,12 @@
 Pillow==8.2.0
-
 numpy~=1.19.5
 sqlalchemy~=1.4.15
 requests~=2.25.1
 flask~=1.1.2
 werkzeug~=1.0.1
+firebase-admin
+requests_cache
+flask_sqlalchemy
+flask_migrate
+gunicorn
+psycopg2

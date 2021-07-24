@@ -1,5 +1,6 @@
 package com.example.fyp
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -7,17 +8,20 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.fyp.data.entities.UserInformation
 import com.example.fyp.data.remote.WebAPI
+import com.example.fyp.databinding.EditProfileNameBinding
 import com.example.fyp.databinding.FragmentLoginBinding
 import com.example.fyp.utils.Utils
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import dagger.hilt.android.AndroidEntryPoint
@@ -62,7 +66,47 @@ class LoginFragment : Fragment() {
         binding = FragmentLoginBinding.inflate(layoutInflater)
         // Inflate the layout for this fragment
 
+        binding.btnForgotPassword.setOnClickListener {
+            val dialogBinding = EditProfileNameBinding.inflate(layoutInflater)
+            dialogBinding.profileNameField.hint = "Email Address"
+            dialogBinding.profileNameField.editText?.inputType =
+                EditorInfo.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
+
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Reset Password")
+                .setView(dialogBinding.root)
+                .setPositiveButton("Confirm", null)
+                .setNegativeButton("Cancel", null)
+                .create()
+                .apply {
+                    setOnShowListener {
+                        getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                            val email = dialogBinding.profileNameField.editText?.text.toString()
+                            if (Utils.isValidEmail(email)) {
+                                auth.sendPasswordResetEmail(email)
+                                    .addOnCompleteListener {
+                                        if (it.isSuccessful) {
+                                            Toast.makeText(
+                                                this.context, "Password Reset Email Sent",
+                                                Toast.LENGTH_SHORT).show()
+                                        } else {
+                                            Toast.makeText(
+                                                this.context, it.exception?.message.toString(),
+                                                Toast.LENGTH_SHORT).show()
+                                        }
+                                        dismiss()
+                                    }
+                            } else {
+                                dialogBinding.profileNameField.error = "Invalid Email"
+                            }
+                        }
+                    }
+                }
+                .show()
+        }
+
         binding.btnSignInWithEmail.setOnClickListener {
+            binding.emailField.error = null
             val email = binding.emailField.editText?.text.toString()
             if (Utils.isValidEmail(email = email)) {
                 auth.signInWithEmailAndPassword(
@@ -70,13 +114,10 @@ class LoginFragment : Fragment() {
                     binding.passwordField.editText?.text.toString()
                 ).addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        Log.d(TAG, "signInWithEmail:success")
                         checkUserInformation()
                     } else {
-                        // If sign in fails, display a message to the user.
-                        Log.w(TAG, "signInWithEmail:failure", task.exception)
                         Toast.makeText(
-                            this.context, "Authentication failed.",
+                            this.context, task.exception?.message.toString(),
                             Toast.LENGTH_SHORT
                         ).show()
                     }

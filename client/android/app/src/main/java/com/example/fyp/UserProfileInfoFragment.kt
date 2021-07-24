@@ -7,9 +7,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import com.example.fyp.adapter.GoalAdapter
 import com.example.fyp.data.entities.Goal
 import com.example.fyp.databinding.FragmentUserProfileInfoBinding
+import com.example.fyp.databinding.GoalDialogBinding
 import com.example.fyp.databinding.PickerDialogBinding
 import com.example.fyp.utils.Utils
 import com.example.fyp.viewmodels.MealViewModel
@@ -122,6 +126,10 @@ class UserProfileInfoFragment : Fragment() {
 
         binding.goalRecycler.adapter = adapter
 
+        binding.btnUpdateGoals.setOnClickListener {
+            showAddGoalDialog()
+        }
+
         return binding.root
     }
 
@@ -147,5 +155,56 @@ class UserProfileInfoFragment : Fragment() {
         binding.weightPercentageEnd.text = endValue.toString()
         binding.textCurrentWeight.text =
             resources.getString(R.string.current_weight_value, weight.toInt())
+    }
+
+    private fun <T> LiveData<T>.observeOnce(lifecycleOwner: LifecycleOwner, observer: Observer<T>) {
+        observe(lifecycleOwner, object : Observer<T> {
+            override fun onChanged(t: T?) {
+                observer.onChanged(t)
+                removeObserver(this)
+            }
+        })
+    }
+
+    private fun showAddGoalDialog() {
+        val binding = GoalDialogBinding.inflate(layoutInflater)
+        val textField = binding.goalValueInput
+        binding.goalRadioGroup.setOnCheckedChangeListener { _, checkedId ->
+            textField.suffixText = when (checkedId) {
+                R.id.radio_weight_goal -> "kg"
+                R.id.radio_calorie_goal -> "kcal"
+                else -> ""
+            }
+        }
+        MaterialAlertDialogBuilder(requireContext())
+            .setNegativeButton(resources.getString(R.string.cancel)) { dialog, _ ->
+                dialog.dismiss()
+            }
+            .setPositiveButton(resources.getString(R.string.confirm)) { dialog, _ ->
+                val goalType = when (binding.goalRadioGroup.checkedRadioButtonId) {
+                    R.id.radio_weight_goal -> 0
+                    R.id.radio_calorie_goal -> 1
+                    else -> 2
+                }
+
+                val goalEndValue = binding.goalValueInput.editText?.text.toString().toInt()
+
+                val currentGoal = when (goalType) {
+                    0 -> viewModel.weightGoal
+                    1 -> viewModel.calorieGoal
+                    else -> TODO()
+                }
+
+                currentGoal.observeOnce(viewLifecycleOwner, {
+                    if (it != null) {
+                        viewModel.setGoal(goalType, null, goalEndValue, it.goalID)
+                    } else {
+                        viewModel.setGoal(goalType, null, goalEndValue, null)
+                    }
+                    dialog.dismiss()
+                })
+            }
+            .setView(binding.root)
+            .show()
     }
 }

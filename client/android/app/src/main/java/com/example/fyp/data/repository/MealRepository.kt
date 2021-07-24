@@ -125,6 +125,11 @@ class MealRepository @Inject constructor(
     fun getSavedItems(): LiveData<Resource<List<SavedItem>>> {
         return object : NetworkBoundResource<List<SavedItem>, List<SavedItem>>(appExecutors) {
             override fun saveCallResult(item: List<SavedItem>) {
+                localSource.deleteAllSavedItems()
+                for (el in item) {
+                    el.serverID = el.id
+                    el.id = 0
+                }
                 localSource.insertSavedFromRemote(*item.toTypedArray())
             }
 
@@ -234,9 +239,65 @@ class MealRepository @Inject constructor(
             uid = "")
     }
 
-    fun updateSavedMeal(savedItem: SavedItem){
+    fun updateSavedMeal(savedItem: SavedItem) {
         appExecutors.diskIO().execute {
             localSource.updateSavedItem(savedItem)
+        }
+
+        if (savedItem.serverID == null) {
+            remoteSource.insertSavedItemToRemote(userId = "me", savedItem)
+                .enqueue(object : Callback<ResponseBody> {
+                    override fun onResponse(
+                        call: Call<ResponseBody>,
+                        response: Response<ResponseBody>,
+                    ) {
+                        if (response.isSuccessful) {
+                            val json = JSONObject(response.body()?.string().toString())
+                            savedItem.serverID = json.getInt("item_id")
+                            appExecutors.diskIO().execute {
+                                localSource.updateSavedItem(savedItem)
+                            }
+                            remoteSource.updateSavedItem(userId = "me",
+                                savedItemID = savedItem.serverID!!,
+                                savedItem = savedItem)
+                                .enqueue(object : Callback<ResponseBody> {
+                                    override fun onResponse(
+                                        call: Call<ResponseBody>,
+                                        response: Response<ResponseBody>,
+                                    ) {
+                                        Log.e("Update Saved Item", "Success")
+                                    }
+
+                                    override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                                        Log.e("Update Saved Item", t.message.toString())
+                                    }
+
+                                })
+                        }
+                    }
+
+                    override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                        Log.e("SERVER", t.message.toString())
+                    }
+
+                })
+        } else {
+            remoteSource.updateSavedItem(userId = "me",
+                savedItemID = savedItem.serverID!!,
+                savedItem = savedItem)
+                .enqueue(object : Callback<ResponseBody> {
+                    override fun onResponse(
+                        call: Call<ResponseBody>,
+                        response: Response<ResponseBody>,
+                    ) {
+                        Log.e("Update Saved Item", "Success")
+                    }
+
+                    override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                        Log.e("Update Saved Item", t.message.toString())
+                    }
+
+                })
         }
     }
 
@@ -275,7 +336,14 @@ class MealRepository @Inject constructor(
     }
 
     fun clearSharedPreference() {
-        sharedPreferences.edit().clear().apply()
+        sharedPreferences.edit()
+            .putString("uid", "")
+            .putLong("dob", 0)
+            .putInt("height", 0)
+            .putFloat("weight", 0F)
+            .putInt("gender", 0)
+            .putBoolean("SIGNED IN", false)
+            .apply()
     }
 
     fun removeSavedMeal(savedItem: SavedItem) {
@@ -290,21 +358,25 @@ class MealRepository @Inject constructor(
             savedItem.id = id.toInt()
         }
 
-        remoteSource.insertSavedItemToRemote(userId = "me",savedItem).enqueue(object : Callback<ResponseBody>{
-            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
-                if (response.isSuccessful) {
-                    val json = JSONObject(response.body()?.string().toString())
-                    savedItem.serverID = json.getInt("item_id")
-                    appExecutors.diskIO().execute {
-                        localSource.updateSavedItem(savedItem)
+        remoteSource.insertSavedItemToRemote(userId = "me", savedItem)
+            .enqueue(object : Callback<ResponseBody> {
+                override fun onResponse(
+                    call: Call<ResponseBody>,
+                    response: Response<ResponseBody>,
+                ) {
+                    if (response.isSuccessful) {
+                        val json = JSONObject(response.body()?.string().toString())
+                        savedItem.serverID = json.getInt("item_id")
+                        appExecutors.diskIO().execute {
+                            localSource.updateSavedItem(savedItem)
+                        }
                     }
                 }
-            }
 
-            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                Log.e("SERVER",t.message.toString())
-            }
+                override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                    Log.e("SERVER", t.message.toString())
+                }
 
-        })
+            })
     }
 }

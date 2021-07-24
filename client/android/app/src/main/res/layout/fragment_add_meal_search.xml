@@ -8,11 +8,15 @@
         android:layout_height="match_parent"
         tools:context=".AddMealSearchFragment">
 
-        <androidx.recyclerview.widget.RecyclerView
+        <com.cooltechworks.views.shimmer.ShimmerRecyclerView
             android:id="@+id/search_result_recycler"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="8dp"
+            app:shimmer_demo_child_count="10"
+            app:shimmer_demo_layout="@layout/layout_demo"
+            app:shimmer_demo_layout_manager_type="linear_vertical"
+            app:shimmer_demo_angle="20"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
     </FrameLayout>
