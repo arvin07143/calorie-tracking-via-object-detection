@@ -1,6 +1,9 @@
 package com.example.fyp.objectdetection
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.content.*
+import android.content.pm.PackageManager
 import android.hardware.display.DisplayManager
 import android.os.Bundle
 import android.provider.MediaStore
@@ -15,6 +18,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.fragment.findNavController
+import com.example.fyp.barcodedetection.MyBarcodeScanner
 import com.example.fyp.databinding.FragmentObjectDetectionBinding
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
@@ -104,6 +108,7 @@ class ObjectDetectionFragment : Fragment() {
         savedInstanceState: Bundle?,
     ): View {
         binding = FragmentObjectDetectionBinding.inflate(layoutInflater)
+
         // Initialize our background executor
         cameraExecutor = Executors.newSingleThreadExecutor()
         broadcastManager = LocalBroadcastManager.getInstance(requireContext())
@@ -151,6 +156,8 @@ class ObjectDetectionFragment : Fragment() {
             orientationEventListener.enable()
         }, ContextCompat.getMainExecutor(requireContext()))
     }
+
+
 
     /** Declare and bind preview, capture and analysis use cases */
     private fun bindCameraUseCases() {
@@ -282,8 +289,26 @@ class ObjectDetectionFragment : Fragment() {
             }
 
             // Set up the camera and its use cases
-            setUpCamera()
+            if (ContextCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.CAMERA
+                ) == PackageManager.PERMISSION_GRANTED
+            ){
+                setUpCamera()
+            } else{
+                requestPermissions(REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
+            }
         }
+    }
+
+    @SuppressLint("MissingPermission")
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray,
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        setUpCamera()
     }
 
     override fun onStop() {
@@ -306,6 +331,10 @@ class ObjectDetectionFragment : Fragment() {
         private const val TAG = "CameraXBasic"
         private const val RATIO_4_3_VALUE = 4.0 / 3.0
         private const val RATIO_16_9_VALUE = 16.0 / 9.0
+        private const val REQUEST_CODE_PERMISSIONS = 11
+
+        // This is an array of all the permission specified in the manifest
+        private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
 
     }
 }
